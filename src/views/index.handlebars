@@ -1,0 +1,35 @@
+<div>
+    <h1>Te muestro mis productos</h1>
+</div>
+<div id="div" style="background-color: white; color: black"></div>
+
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"
+    integrity="sha384-2huaZvOR9iDzHqslqwpR87isEmrfxqyWOF7hr7BY6KG0+hVKLoEXMPUJw3ynWuhO"
+    crossorigin="anonymous"></script>
+<script type="module">
+    const address = 'ws://localhost:8080';
+    const socketClient = io(address);
+    const div = document.getElementById('div');
+
+    socketClient.on('newClientConnected', data => {
+        console.log(data)
+    })
+
+    socketClient.on('products', data => {
+        console.log(data)
+        data.forEach(({ id, title, description, price, category, stock }) => {
+            div.innerHTML += `
+                <h3>Nombre: ${title}</h3>
+                <p>Id: ${id}</p>
+                <p>Descripcion: ${description}</p>
+                <p>Precio: ${price}</p>
+                <p>Categoria: ${category}</p>
+                <p>Stock: ${stock}</p>
+
+            `
+        })
+    })
+
+
+
+</script>

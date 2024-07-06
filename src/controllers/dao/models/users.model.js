@@ -11,7 +11,7 @@ const schema = new mongoose.Schema({
     gender: { type: String, required: true },
     password: { type: String, required: true },
 });
-
+schema.plugin(mongoosePaginate)
 const modelUsers = mongoose.model(collection, schema);
 
 export { modelUsers };

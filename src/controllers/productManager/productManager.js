@@ -1,4 +1,3 @@
-import { error } from 'console';
 import fs from 'fs';
 
 class ProctManager {

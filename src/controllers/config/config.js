@@ -2,6 +2,7 @@ import * as url from 'url';
 import dotenv from 'dotenv';
 import { Command } from 'commander';
 
+
 //Configuracion de comand Line
 const commandLine = new Command();
 commandLine
@@ -20,7 +21,7 @@ dotenv.config({ path: clOptions.mode === 'prod' ? '.env.prod' : '.env.devel' });
 const config = {
     APP_NAME: process.env.APP_NAME,
     PORT: process.env.PORT || clOptions.port || 5050,
-    DIRNAME: url.fileURLToPath(new URL('../', import.meta.url)),
+    DIRNAME: url.fileURLToPath(new URL('../../', import.meta.url)),
     // UPLOAD_DIR: 'public/img'
     get UPLOAD_DIR() { return `${this.DIRNAME}/public/img` },
     MONGODB_ID_REGEX: /^[a-fA-F0-9]{24}$/,

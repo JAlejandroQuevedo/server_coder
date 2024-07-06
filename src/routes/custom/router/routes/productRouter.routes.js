@@ -1,6 +1,5 @@
 import { CustomRouter } from "../routesClass/custom.router.js";
-import { CollectionManager } from '../../../dao/manager/manager.mdb.js';
-import { modelProducts } from '../../../dao/models/products.model.js';
+import { CollectionManager } from '../../../../controllers/dao/manager/manager.mdb.js';
 export class ProductRouter extends CustomRouter {
     init() {
         this.get('/productRouter', async (req, res) => {

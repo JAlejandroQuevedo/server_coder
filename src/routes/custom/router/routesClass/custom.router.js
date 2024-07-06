@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { config } from '../../../config/config.js';
+import { config } from '../../../../controllers/config/config.js';
 
 export class CustomRouter {
     constructor() {

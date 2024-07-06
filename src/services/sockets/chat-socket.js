@@ -1,5 +1,5 @@
 import { Server } from "socket.io";
-import { modelMessages } from "../dao/models/messages.model.js";
+import { modelMessages } from "../../controllers/dao/models/messages.model.js";
 
 const chatSocket = (server) => {
     let messages = [];

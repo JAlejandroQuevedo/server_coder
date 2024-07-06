@@ -1,10 +1,10 @@
 import passport from "passport";
 import { Router } from "express";
-import { config } from "../../config/config.js";
-import { createToken, verifyToken } from "../../utils/jwtUtil.js";
-import { verifyRequiredBody, adminAuth } from "../../middleWars/middleSession.js";
-import { ManagerCurrent } from "../../dao/manager/currentManager.mdb.js";
-import { createHash, isValidPassword } from "../../utils/bycript.js";
+import { config } from "../../controllers/config/config.js";
+import { createToken, verifyToken } from "../../services/utils/jwtUtil.js";
+import { verifyRequiredBody, adminAuth } from "../../controllers/middleWars/middleSession.js";
+import { ManagerCurrent } from "../../controllers/dao/manager/currentManager.mdb.js";
+import { createHash, isValidPassword } from "../../services/utils/bycript.js";
 import { initAuthStrategiesCurrent } from "../../auth/current/passportCurrent.strategies.js";
 const current = Router()
 initAuthStrategiesCurrent()

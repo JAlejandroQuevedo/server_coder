@@ -1,5 +1,5 @@
-import { modelUsersCurrent } from "../models/user_current.model.js";
-import { ColectionManagerCart } from "./managerCart.mdb.js";
+import { modelUsersCurrent } from '../models/user_current.model.js';
+import { ColectionManagerCart } from './managerCart.mdb.js';
 
 class ManagerCurrent {
 

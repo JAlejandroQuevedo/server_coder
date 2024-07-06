@@ -1,4 +1,4 @@
-import { config } from "../config/config.js";
+import { config } from '../../controllers/config/config.js';
 import jwt from 'jsonwebtoken';
 
 

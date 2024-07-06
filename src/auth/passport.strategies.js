@@ -2,10 +2,9 @@ import passport from 'passport';
 import local from 'passport-local';
 import GitHubStrategy from 'passport-github2';
 import jwt from 'passport-jwt';
-
-import { ManagerLogin } from '../dao/manager/managerLogin.mdb.js';
-import { isValidPassword, createHash } from '../utils/bycript.js';
-import { config } from '../config/config.js';
+import { ManagerLogin } from '../controllers/dao/manager/managerLogin.mdb.js';
+import { isValidPassword, createHash } from '../services/utils/bycript.js';
+import { config } from '../controllers/config/config.js';
 
 const localStrategy = local.Strategy;
 const jwtStrategy = jwt.Strategy;

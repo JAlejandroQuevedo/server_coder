@@ -1,10 +1,9 @@
 import passport from 'passport';
 import local from 'passport-local';
 import jwt from 'passport-jwt';
-
-import { ManagerCurrent } from '../../dao/manager/currentManager.mdb.js';
-import { isValidPassword, createHash } from '../../utils/bycript.js';
-import { config } from '../../config/config.js';
+import { ManagerCurrent } from '../../controllers/dao/manager/currentManager.mdb.js';
+import { isValidPassword, createHash } from '../../services/utils/bycript.js';
+import { config } from '../../controllers/config/config.js';
 
 const localStrategy = local.Strategy;
 const jwtStrategy = jwt.Strategy;

@@ -1,7 +1,8 @@
 import { Router } from "express";
-import { modelCart } from "../dao/models/cart.model.js";
-import { ColectionManagerCart } from "../dao/manager/managerCart.mdb.js";
+import { modelCart } from "../controllers/dao/models/cart.model.js";
+import { ColectionManagerCart } from "../controllers/dao/manager/managerCart.mdb.js";
 import { socketServer } from "../index.js";
+
 
 const routerCart = Router()
 routerCart.get('/carts/sort/:sort', async (req, res) => {

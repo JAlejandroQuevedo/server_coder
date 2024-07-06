@@ -1,20 +1,18 @@
 import { Router } from 'express';
-import { data } from '../data/dataProductManager.js';
-import { uploader } from '../uploader/uploader.js';
+import { uploader } from '../services/uploader/uploader.js';
 import { socketServer } from '../index.js';
-import { modelProducts } from '../dao/models/products.model.js';
-import { CollectionManager } from '../dao/manager/manager.mdb.js';
+import { modelProducts } from '../controllers/dao/models/products.model.js';
+import { CollectionManager } from '../controllers/dao/manager/manager.mdb.js';
 
 
 
-const router = Router();
-const dataProducts = data;
+const routerProducts = Router();
 
 
-router.get('/', (req, res) => {
+routerProducts.get('/', (req, res) => {
     res.json('Por favor realiza una peticion')
 })
-router.get('/products/sort/:sort', async (req, res) => {
+routerProducts.get('/products/sort/:sort', async (req, res) => {
     try {
         const { sort } = req.params;
         const numberSort = +sort
@@ -29,7 +27,7 @@ router.get('/products/sort/:sort', async (req, res) => {
         res.status(500).send('Error en el servidor', err)
     }
 })
-router.get('/products', async (req, res) => {
+routerProducts.get('/products', async (req, res) => {
     try {    //NOTA: Si agregas el query despues del /products sin query, te arroja todos los productos aunque el codigo este correcto
         const limit = +req.query.limit || 0
         if (limit <= modelProducts.length) {
@@ -50,7 +48,7 @@ router.get('/products', async (req, res) => {
     }
 })
 
-router.get('/products/:id', async (req, res) => {
+routerProducts.get('/products/:id', async (req, res) => {
     try {
         const { id } = req.params;
         const product = await CollectionManager.getProductById(id);
@@ -71,7 +69,7 @@ router.get('/products/:id', async (req, res) => {
         res.status(500).json('Error interno del servidor')
     }
 })
-router.get('/products/pages/:page', async (req, res) => {
+routerProducts.get('/products/pages/:page', async (req, res) => {
     try {
         const { page } = req.params;
         // const process = await modelProducts.paginate({ role: 'admin' }, { page: page, limit: 100 });
@@ -88,7 +86,7 @@ router.get('/products/pages/:page', async (req, res) => {
         res.status(500).json('Error interno del servidor')
     }
 })
-router.post('/products', uploader.single('thumbnail'), async (req, res) => {
+routerProducts.post('/products', uploader.single('thumbnail'), async (req, res) => {
     try {
         const { title, description, price, code, stock } = req.body;
         const thumbnail = req.file.destination;
@@ -101,7 +99,7 @@ router.post('/products', uploader.single('thumbnail'), async (req, res) => {
         res.status(500).json('Error interno en el servidor');
     }
 })
-router.put('/products/:id', async (req, res) => {
+routerProducts.put('/products/:id', async (req, res) => {
     try {
         const filter = { _id: req.params.id }
         const update = req.body;
@@ -115,7 +113,7 @@ router.put('/products/:id', async (req, res) => {
         res.status(500).send('Error al interno en el servidor');
     }
 })
-router.delete('/products/:id', async (req, res) => {
+routerProducts.delete('/products/:id', async (req, res) => {
     try {
         const filter = { _id: req.params.id };
         await CollectionManager.deleteProductById(filter);
@@ -128,4 +126,4 @@ router.delete('/products/:id', async (req, res) => {
         res.status(500).send('Error interno del servidor')
     }
 })
-export { router, dataProducts }
+export { routerProducts }

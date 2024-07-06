@@ -1,9 +1,9 @@
 import passport from "passport";
-import { config } from "../../config/config.js";
+import { config } from "../../controllers/config/config.js";
 import { Router } from "express";
-import { verifyRequiredBody, adminAuth } from "../../middleWars/middleSession.js";
+import { verifyRequiredBody, adminAuth } from "../../controllers/middleWars/middleSession.js";
 import { initAuthStrategies } from "../../auth/passport.strategies.js";
-import { ManagerLogin } from "../../dao/manager/managerLogin.mdb.js";
+import { ManagerLogin } from "../../controllers/dao/manager/managerLogin.mdb.js";
 const sesionPassport = Router()
 initAuthStrategies()
 sesionPassport.get('/users', async (req, res) => {

@@ -1,5 +1,6 @@
 import { config } from "../config/config.js";
 
+
 const verifyRequiredBody = (requiredFields) => {
     return (req, res, next) => {
         const allOk = requiredFields.every(field =>

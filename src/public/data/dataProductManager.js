@@ -1,4 +1,4 @@
-import { ProctManager } from "../productManager/productManager.js";
+import { ProctManager } from "../../controllers/productManager/productManager.js";
 
 let product1 = await ProctManager.addProduct('Mi producto', 'Este es un ejemplo de un producto', 129, 'Category', 'IMG Prueba', 12234, 3);
 let product3 = await ProctManager.addProduct('Mi producto', 'Este es un ejemplo de un producto', 129, 'Category', 'IMG Prueba', 1223456, 3);

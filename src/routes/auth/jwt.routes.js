@@ -52,7 +52,6 @@ jwtRouter.post('/jwtlogin', verifyRequiredBody(['email', 'password']), passport.
         } else {
             res.status(401).send({ origin: config.PORT, payload: 'Datos de acceso no válidos' });
         }
-
     } catch (err) {
         res.status(500).send({ origin: config.SERVER, payload: null, error: err.message });
     }
@@ -60,7 +59,6 @@ jwtRouter.post('/jwtlogin', verifyRequiredBody(['email', 'password']), passport.
 jwtRouter.get('/jwtAuth', verifyToken, passport.authenticate('jwtlogin', { failureRedirect: `/login?error=${encodeURI('Usuario o clave no válidos')}` }), async (req, res) => {
     try {
         req.session.user = req.user;
-        console.log(req.user)
         req.session.save(err => {
             if (err) return res.status(500).send({ origin: config.PORT, payload: null, error: err.message });
 

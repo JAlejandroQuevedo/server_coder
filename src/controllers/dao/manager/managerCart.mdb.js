@@ -20,6 +20,23 @@ class ColectionManagerCart {
             console.error('Error al leer el archivo', error)
         }
     }
+    static async endPurchase(_cid) {
+        try {
+            const productCart = await modelCart.findById(_cid);
+            const { _product_id, quantity } = productCart;
+            const product = await modelProducts.findById(_product_id);
+            const { stock } = product;
+
+            if (stock < quantity || quantity > stock) throw new Error('El stock es mayor a la cantidad indicada en el carrito, la compra no puede ser procesada');
+            const newStock = +stock - quantity;
+            await modelProducts.updateOne({ _id: _product_id }, { $set: { stock: `${newStock}` } });
+            await modelCart.findOneAndDelete(_cid)
+
+        }
+        catch (err) {
+            console.error('Error al intentar terminar con la compra', err)
+        }
+    }
     static async getProductCartById(id) {
         const products = await modelCart.findById(id);
         if (!products) {
@@ -35,7 +52,7 @@ class ColectionManagerCart {
             console.error('Error al cargar el producto', error)
         }
     }
-    static async addToCart(id) {
+    static async addToCart(id, _user_id) {
         try {
             const productAdd = await modelProducts.findById(id)
             // const productAdd2 = await modelCart.find().populate({ path: '_id', model: modelProducts })
@@ -50,6 +67,7 @@ class ColectionManagerCart {
                 } else {
                     const productCart = {
                         _product_id: productID,
+                        _user_id,
                         title,
                         price,
                         thumbnail,

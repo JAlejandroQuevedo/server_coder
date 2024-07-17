@@ -1,5 +1,7 @@
-import { modelProducts } from "../models/products.model.js";
+import modelProducts from "../factory/dao.factory.js";
+// import { modelProducts } from "../models/products.model.js";
 
+// const modelProducts = new ProductsService()
 
 class CollectionManager {
 
@@ -22,22 +24,21 @@ class CollectionManager {
     }
     static async addProduct(title, description, price, category, thumbnail, code, stock) {
         try {
-            if (this.products.some(product => product.code === code)) {
-                console.error(`El codigo de tu producto se encuentra en uso`)
-            }
+            if (this.products.some(product => product.code === code)) return console.error(`El codigo de tu producto se encuentra en uso`)
+
             const product = {
-                title,
-                description,
-                price,
+                title: title,
+                description: description,
+                price: price,
                 status: true,
-                category,
-                thumbnail,
-                code,
-                stock
+                category: category,
+                thumbnail: thumbnail,
+                code: code,
+                stock: stock
             };
+            if (this.products.some(product => product.code === code)) return
             this.products.push(product);
-            let data = this.products
-            await modelProducts.create(data)
+            await modelProducts.create(product)
         }
         catch (error) {
             console.error('Error al intentar escribir el archivo', error)

@@ -7,6 +7,7 @@ const collection = 'cart';
 
 const schema = new mongoose.Schema({
     _product_id: { type: mongoose.Schema.Types.ObjectId, required: true },
+    _user_id: { type: mongoose.Schema.Types.ObjectId, required: true },
     title: { type: String, required: true },
     price: { type: String, required: true },
     thumbnail: { type: Object, required: false },

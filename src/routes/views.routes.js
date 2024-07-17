@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { handlePolicies } from "../services/utils/policies.js";
 
 
 const routerHandle = Router();
@@ -10,7 +11,7 @@ routerHandle.get('/product', (req, res) => {
 routerHandle.get('/cart', (req, res) => {
     res.render('cart.handlebars', {})
 })
-routerHandle.get('/chat', (req, res) => {
+routerHandle.get('/chat', handlePolicies(['user']), (req, res) => {
     res.render('chat.handlebars', {})
 })
 routerHandle.get('/register', (req, res) => {

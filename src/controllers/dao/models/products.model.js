@@ -10,9 +10,9 @@ const schema = new mongoose.Schema({
     price: { type: String, required: true },
     status: { type: Boolean, required: false },
     category: { type: String, required: true },
-    thumbnail: { type: Object, required: false },
+    thumbnail: { type: String, required: false },
     code: { type: String, required: true },
-    stock: { type: String, required: false }
+    stock: { type: String, required: true }
 });
 
 schema.plugin(mongoosePaginate)

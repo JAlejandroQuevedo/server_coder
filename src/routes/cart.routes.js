@@ -2,6 +2,7 @@ import { Router } from "express";
 import { modelCart } from "../controllers/dao/models/cart.model.js";
 import { ColectionManagerCart } from "../controllers/dao/manager/managerCart.mdb.js";
 import { socketServer } from "../index.js";
+import { handlePolicies } from "../services/utils/policies.js";
 
 
 const routerCart = Router()
@@ -70,7 +71,33 @@ routerCart.get('/carts/:id', async (req, res) => {
         res.status(500).json('Error interno del servidor')
     }
 })
-routerCart.post('/carts/:id', async (req, res) => {
+routerCart.get('/carts/purchase/:_cid', async (req, res) => {
+    try {
+        const { _cid } = req.params;
+        await ColectionManagerCart.endPurchase(_cid);
+        res.status(200).send('Compra finalizada con exito');
+        const productsCart = await ColectionManagerCart.getProducts();
+        socketServer.emit('productsCart', productsCart)
+    }
+    catch (err) {
+        console.error('Error al ingresar el producto, favor de que exista en el total de productoss', err);
+        res.status(500).json('Error interno en el servidor')
+    }
+})
+routerCart.post('/carts/:id', handlePolicies(['user']), async (req, res) => {
+    try {
+        const { id } = req.params
+        const _user_id = req.session.user._id;
+        await ColectionManagerCart.addToCart(id, _user_id)
+        res.status(200).send('Producto agregado con exito al carrito');
+        const productsCart = await ColectionManagerCart.getProducts();
+        socketServer.emit('productsCart', productsCart)
+    } catch (err) {
+        console.error('Error al ingresar el producto, favor de que exista en el total de productoss', err);
+        res.status(500).json('Error interno en el servidor')
+    }
+})
+routerCart.put('/carts/:id', handlePolicies(['user']), async (req, res) => {
     try {
         const { id } = req.params
         await ColectionManagerCart.addToCart(id)
@@ -82,19 +109,7 @@ routerCart.post('/carts/:id', async (req, res) => {
         res.status(500).json('Error interno en el servidor')
     }
 })
-routerCart.put('/carts/:id', async (req, res) => {
-    try {
-        const { id } = req.params
-        await ColectionManagerCart.addToCart(id)
-        res.status(200).send('Producto agregado con exito al carrito');
-        const productsCart = await ColectionManagerCart.getProducts();
-        socketServer.emit('productsCart', productsCart)
-    } catch (err) {
-        console.error('Error al ingresar el producto, favor de que exista en el total de productoss', err);
-        res.status(500).json('Error interno en el servidor')
-    }
-})
-routerCart.put('/carts/:id', async (req, res) => {
+routerCart.put('/carts/:id', handlePolicies(['user']), async (req, res) => {
     try {
         const filter = { _id: req.params.id }
         const update = req.body;
@@ -107,7 +122,7 @@ routerCart.put('/carts/:id', async (req, res) => {
         res.status(500).send('Error al interno en el servidor');
     }
 })
-routerCart.put('/carts/:id/products/:cid', async (req, res) => {
+routerCart.put('/carts/:id/products/:cid', handlePolicies(['user']), async (req, res) => {
     try {
         const filter = { _id: req.params.id }
         const quantity = +req.params.cid;

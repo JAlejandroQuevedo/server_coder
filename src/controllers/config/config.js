@@ -1,4 +1,5 @@
 import * as url from 'url';
+import path from 'path';
 import dotenv from 'dotenv';
 import { Command } from 'commander';
 
@@ -21,6 +22,7 @@ dotenv.config({ path: clOptions.mode === 'prod' ? '.env.prod' : '.env.devel' });
 const config = {
     APP_NAME: process.env.APP_NAME,
     PORT: process.env.PORT || clOptions.port || 5050,
+    // DIRNAME: path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:\/)/, '$1')),
     DIRNAME: url.fileURLToPath(new URL('../../', import.meta.url)),
     // UPLOAD_DIR: 'public/img'
     get UPLOAD_DIR() { return `${this.DIRNAME}/public/img` },
@@ -29,7 +31,8 @@ const config = {
     SECRET: process.env.SECRET,
     GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
     GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
-    GITHUB_CALLBACK_URL: process.env.GITHUB_CALLBACK_URL
+    GITHUB_CALLBACK_URL: process.env.GITHUB_CALLBACK_URL,
+    PERSISTENCE: 'mongo'
     // MONGODB_URI: 'mongodb+srv://coder_53160:coder2024@clustercoder.sxqjiud.mongodb.net/coder_53160',
 }
 

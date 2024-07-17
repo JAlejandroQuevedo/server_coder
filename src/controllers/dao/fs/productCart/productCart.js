@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { data } from '../../public/data/dataProductManager.js';
+import { data } from '../../../../public/data/dataProductManager.js';
 
 
 class ProductCart {

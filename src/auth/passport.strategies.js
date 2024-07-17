@@ -24,9 +24,9 @@ const initAuthStrategies = () => {
                 const foundUser = await ManagerLogin.getOne({ email: username });
 
                 if (foundUser && isValidPassword(password, foundUser.password)) {
-                    const { name, lastName, email, gender } = foundUser;
-                    const savedRol = "admin";
-                    const userDone = req.session.user = { name: name, lastName: lastName, email: email, gender: gender, role: savedRol };
+                    const { _id, name, lastName, email, gender } = foundUser;
+                    const savedRol = "user";
+                    const userDone = req.session.user = { _id: _id, name: name, lastName: lastName, email: email, gender: gender, role: savedRol };
                     return done(null, userDone);
                 } else {
                     return done(null, false);

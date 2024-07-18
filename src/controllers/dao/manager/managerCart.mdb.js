@@ -1,18 +1,49 @@
 import { modelCart } from "../models/cart.model.js";
 import { modelProducts } from "../models/products.model.js";
+import { cartHistorial } from "../models/cart_historial.model.js";
 
 class ColectionManagerCart {
     static cart = [];
     static data;
 
-    static async getProducts(limit) {
+    static async getUserCart(_user_id, limit) {
         try {
             if (limit) {
-                const products = await modelCart.find()
+                const products = await modelCart.find({ _user_id: _user_id })
                 this.cart = products;
                 return limit === 0 ? products : products.slice(0, limit);
             } else {
-                const products = await modelCart.find()
+                const products = await modelCart.find({ _user_id: _user_id })
+                return products;
+            }
+        }
+        catch (error) {
+            console.error('Error al leer el archivo', error)
+        }
+    }
+    // static async getProducts(_user_id, limit) {
+    //     try {
+    //         if (limit) {
+    //             const products = await modelCart.find({})
+    //             this.cart = products;
+    //             return limit === 0 ? products : products.slice(0, limit);
+    //         } else {
+    //             const products = await modelCart.find()
+    //             return products;
+    //         }
+    //     }
+    //     catch (error) {
+    //         console.error('Error al leer el archivo', error)
+    //     }
+    // }
+    static async getHistorial(limit) {
+        try {
+            if (limit) {
+                const products = await cartHistorial.find()
+                this.cart = products;
+                return limit === 0 ? products : products.slice(0, limit);
+            } else {
+                const products = await cartHistorial.find()
                 return products;
             }
         }
@@ -32,7 +63,7 @@ class ColectionManagerCart {
                     if (stock < quantity || quantity > stock) return console.error('El stock es mayor a la cantidad indicada en el carrito, la compra no puede ser procesada');
                     const newStock = +stock - quantity;
                     await modelProducts.updateOne({ _id: _product_id }, { $set: { stock: `${newStock}` } });
-                    // await modelCart.findOneAndDelete(_cid)
+                    await modelCart.findOneAndDelete({ _user_id: _user_id })
                 })
             }));
         }
@@ -74,10 +105,12 @@ class ColectionManagerCart {
                 }
                 this.cart.push(productCart)
                 await modelCart.create(productCart);
+                await cartHistorial.create(productCart);
             } else {
-                const { quantity } = productInCart
+                const { quantity } = productInCart;
                 const newCuantity = quantity + 1;
-                await modelCart.updateOne({ _user_id: _user_id, _product_id: id }, { $set: { quantity: newCuantity } })
+                await modelCart.updateOne({ _user_id: _user_id, _product_id: id }, { $set: { quantity: newCuantity } });
+                await cartHistorial.updateOne({ _user_id: _user_id, _product_id: id }, { $set: { quantity: newCuantity } });
             }
         } catch (err) {
             console.error('Existe un error al intentar agregar tu producto al carrito', err)

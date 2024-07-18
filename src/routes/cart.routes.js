@@ -24,13 +24,33 @@ routerCart.get('/carts', async (req, res) => {
     try {
         const limit = +req.query.limit || 0;
         if (limit <= modelCart.length) {
-            const cart = await ColectionManagerCart.getProducts(limit);
+            const _user_id = req.session.user._id;
+            const cart = await ColectionManagerCart.getUserCart(_user_id, limit);
             res.send({
                 status: 1,
                 cart
             })
-            const publicCart = await ColectionManagerCart.getProducts()
+            const publicCart = await ColectionManagerCart.getUserCart()
             socketServer.emit('productsCart', publicCart)
+        } else {
+            res.status(400).json('Lo siento, no contamos con la cantidad de productos solicitada');
+        }
+    } catch (err) {
+        console.error('Error al obtener los productos', err);
+        res.status(500).send('Error interno del servidor')
+    }
+})
+routerCart.get('/historial', handlePolicies(['admin']), async (req, res) => {
+    try {
+        const limit = +req.query.limit || 0;
+        if (limit <= modelCart.length) {
+            const historial = await ColectionManagerCart.getHistorial(limit);
+            res.send({
+                status: 1,
+                historial
+            })
+            const historialCart = await ColectionManagerCart.getHistorial();
+            socketServer.emit('historialCart', historialCart);
         } else {
             res.status(400).json('Lo siento, no contamos con la cantidad de productos solicitada');
         }

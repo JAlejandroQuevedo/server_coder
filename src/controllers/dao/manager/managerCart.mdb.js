@@ -58,7 +58,6 @@ class ColectionManagerCart {
 
             const userCartProducts = await modelCart.find({ _user_id: _user_id });
             const productInCart = userCartProducts.find(product => product._product_id.toString() === id);
-            const { quantity } = productInCart
             if (!productInCart) {
                 const { id: productID, title, price, thumbnail, stock } = productAdd;
                 const productCart = {
@@ -73,6 +72,7 @@ class ColectionManagerCart {
                 this.cart.push(productCart)
                 await modelCart.create(productCart);
             } else {
+                const { quantity } = productInCart
                 const newCuantity = quantity + 1;
                 await modelCart.updateOne({ _user_id: _user_id }, { $set: { quantity: newCuantity } })
             }

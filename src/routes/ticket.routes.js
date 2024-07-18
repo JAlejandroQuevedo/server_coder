@@ -20,10 +20,10 @@ routerTicket.get('/tickets', async (req, res) => {
     }
 })
 
-routerTicket.post('/tickets/:_cartId', async (req, res) => {
+routerTicket.post('/tickets', async (req, res) => {
     try {
-        const { _cartId } = req.params;
-        await ColectionManagerTicket.createTicket(_cartId);
+        const _user_id = req.session.user._id
+        await ColectionManagerTicket.createTicket(_user_id);
         res.status(200).send('Ticket creado con exito');
         const tickets = await ColectionManagerTicket.getTickets()
         socketServer.emit('tickets', tickets)

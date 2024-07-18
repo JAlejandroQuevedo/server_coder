@@ -32,6 +32,7 @@ class ColectionManagerCart {
                     if (stock < quantity || quantity > stock) return console.error('El stock es mayor a la cantidad indicada en el carrito, la compra no puede ser procesada');
                     const newStock = +stock - quantity;
                     await modelProducts.updateOne({ _id: _product_id }, { $set: { stock: `${newStock}` } });
+                    // await modelCart.findOneAndDelete(_cid)
                 })
             }));
         }

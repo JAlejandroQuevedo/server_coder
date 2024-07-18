@@ -15,7 +15,7 @@ routerTicket.get('/tickets', async (req, res) => {
         })
     }
     catch (err) {
-        console.error('Existe un error al obtener los usuarios', err)
+        console.error('Existe un error al obtener los tickets', err)
         res.status(500).json('Error interno del servidor')
     }
 })

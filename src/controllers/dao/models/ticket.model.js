@@ -13,7 +13,6 @@ const schema = new mongoose.Schema({
     purchaser: { type: String, required: false },
 });
 
-schema.plugin(mongoosePaginate)
 const modelTicket = mongoose.model(collection, schema);
 
 export { modelTicket };

@@ -20,18 +20,20 @@ class ColectionManagerCart {
             console.error('Error al leer el archivo', error)
         }
     }
-    static async endPurchase(_cid) {
+    static async endPurchase(_user_id) {
         try {
-            const productCart = await modelCart.findById(_cid);
-            const { _product_id, quantity } = productCart;
-            const product = await modelProducts.findById(_product_id);
-            const { stock } = product;
-
-            if (stock < quantity || quantity > stock) throw new Error('El stock es mayor a la cantidad indicada en el carrito, la compra no puede ser procesada');
-            const newStock = +stock - quantity;
-            await modelProducts.updateOne({ _id: _product_id }, { $set: { stock: `${newStock}` } });
-            // await modelCart.findOneAndDelete(_cid)
-
+            const productCart = await modelCart.find({ _user_id: _user_id });
+            const cart = productCart.map(({ _product_id, quantity }) => ({ _product_id, quantity }));
+            const products = await Promise.all(cart.map(async (productFind) => {
+                return await modelProducts.findById(productFind._product_id)
+            }))
+            return await Promise.all(products.map(async ({ stock }) => {
+                cart.map(async ({ _product_id, quantity }) => {
+                    if (stock < quantity || quantity > stock) return console.error('El stock es mayor a la cantidad indicada en el carrito, la compra no puede ser procesada');
+                    const newStock = +stock - quantity;
+                    await modelProducts.updateOne({ _id: _product_id }, { $set: { stock: `${newStock}` } });
+                })
+            }));
         }
         catch (err) {
             console.error('Error al intentar terminar con la compra', err)
@@ -74,7 +76,7 @@ class ColectionManagerCart {
             } else {
                 const { quantity } = productInCart
                 const newCuantity = quantity + 1;
-                await modelCart.updateOne({ _user_id: _user_id }, { $set: { quantity: newCuantity } })
+                await modelCart.updateOne({ _user_id: _user_id, _product_id: id }, { $set: { quantity: newCuantity } })
             }
         } catch (err) {
             console.error('Existe un error al intentar agregar tu producto al carrito', err)

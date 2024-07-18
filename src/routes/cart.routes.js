@@ -71,10 +71,10 @@ routerCart.get('/carts/:id', async (req, res) => {
         res.status(500).json('Error interno del servidor')
     }
 })
-routerCart.get('/carts/purchase/:_cid', async (req, res) => {
+routerCart.get('/purchase', async (req, res) => {
     try {
-        const { _cid } = req.params;
-        await ColectionManagerCart.endPurchase(_cid);
+        const _user_id = req.session.user._id;
+        await ColectionManagerCart.endPurchase(_user_id);
         res.status(200).send('Compra finalizada con exito');
         const productsCart = await ColectionManagerCart.getProducts();
         socketServer.emit('productsCart', productsCart)

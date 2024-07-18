@@ -1,6 +1,7 @@
 import { modelTicket } from "../models/ticket.model.js";
 import { modelCart } from "../models/cart.model.js";
 import { modelUsers } from "../models/users.model.js";
+import { generateCode } from "../../../services/utils/code.js";
 
 class ColectionManagerTicket {
     static tickets = [];
@@ -21,25 +22,32 @@ class ColectionManagerTicket {
             console.error('Error al leer el archivo', error)
         }
     }
-    static async createTicket(cart_id) {
+    static async createTicket(_user_id) {
         try {
-            const productGet = await modelCart.findById(cart_id);
-            const { _user_id } = productGet;
             const userGet = await modelUsers.findById(_user_id);
-
-            if (productGet) {
-                const { _id, price, quantity } = productGet;
+            const productGet = await modelCart.find({ _user_id: _user_id });
+            const cart = productGet.map(({ _id, price, quantity }) => ({ _id, price, quantity }));
+            const _product_id = productGet.map(({ _product_id }) => ({ _product_id }))
+            if (cart.length > 0) {
+                const amount = cart.reduce((total, product) => {
+                    return total + (product.quantity * +product.price);
+                }, 0);
                 const { email } = userGet;
-                const amount = +price * quantity;
                 const date = new Date();
                 const fullDate = date.toLocaleDateString();
                 const hour = date.getHours();
-                const minutes = date.getMinutes();
-
+                const min = date.getMinutes();
+                let minutes;
+                if (min < 10) {
+                    minutes = `0${min}`
+                } else {
+                    minutes = min
+                }
                 const purchase_datetime = `Fecha: ${fullDate} / Hora: ${hour}:${minutes}`;
 
                 const ticket = {
-                    _code: _id,
+                    _product_id,
+                    _code: `${generateCode()}`,
                     amount,
                     purchase_datetime: purchase_datetime,
                     purchaser: email

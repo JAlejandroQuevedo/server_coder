@@ -54,36 +54,27 @@ class ColectionManagerCart {
     }
     static async addToCart(id, _user_id) {
         try {
-            const productAdd = await modelProducts.findById(id)
-            // const productAdd2 = await modelCart.find().populate({ path: '_id', model: modelProducts })
-            // console.log(productAdd2)
+            const productAdd = await modelProducts.findById(id);
 
-            if (productAdd) {
+            const userCartProducts = await modelCart.find({ _user_id: _user_id });
+            const productInCart = userCartProducts.find(product => product._product_id.toString() === id);
+            const { quantity } = productInCart
+            if (!productInCart) {
                 const { id: productID, title, price, thumbnail, stock } = productAdd;
-                const find = this.cart.find(product => product._product_id.toString() === id);
-                if (find) {
-                    find.quantity += 1;
-                    await modelCart.updateOne({ _product_id: productID }, { $inc: { quantity: 1 } });
-                } else {
-                    const productCart = {
-                        _product_id: productID,
-                        _user_id,
-                        title,
-                        price,
-                        thumbnail,
-                        stock,
-                        quantity: 1
-                    }
-                    this.cart.push(productCart)
-                    await modelCart.deleteMany({ _product_id: productID });
-                    await modelCart.create(productCart);
+                const productCart = {
+                    _product_id: productID,
+                    _user_id: _user_id,
+                    title,
+                    price,
+                    thumbnail,
+                    stock,
+                    quantity: 1
                 }
-                // const cartWhithoutId = this.cart.map(e => {
-                //     const { id, ...rest } = e._doc ? e._doc : e;
-                //     return rest
-                // })
+                this.cart.push(productCart)
+                await modelCart.create(productCart);
             } else {
-                console.log('El producto que deseas agregar es incorrecto')
+                const newCuantity = quantity + 1;
+                await modelCart.updateOne({ _user_id: _user_id }, { $set: { quantity: newCuantity } })
             }
         } catch (err) {
             console.error('Existe un error al intentar agregar tu producto al carrito', err)

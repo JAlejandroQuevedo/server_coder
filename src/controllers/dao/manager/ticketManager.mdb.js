@@ -21,41 +21,38 @@ class ColectionManagerTicket {
             console.error('Error al leer el archivo', error)
         }
     }
-    static async createTicket(_user_id) {
+    static async createTicket(cart_id) {
         try {
+            const productGet = await modelCart.findById(cart_id);
+            const { _user_id } = productGet;
             const userGet = await modelUsers.findById(_user_id);
-            const productGet = await modelCart.find({ _user_id: _user_id });
-            // console.log(productGet)
-            const cart = productGet.map(({ _id, price, quantity }) => ({ _id, price, quantity }))
-            console.log(cart)
-            // if (cart.length > 0) {
-            //     const amount = cart.reduce((total, product) => {
-            //         return total + (product.quantity * +product.price);
-            //     }, 0);
-            //     const { email } = userGet;
-            //     const date = new Date();
-            //     const fullDate = date.toLocaleDateString();
-            //     const hour = date.getHours();
-            //     const minutes = date.getMinutes();
 
-            //     const purchase_datetime = `Fecha: ${fullDate} / Hora: ${hour}:${minutes}`;
+            if (productGet) {
+                const { _id, price, quantity } = productGet;
+                const { email } = userGet;
+                const amount = +price * quantity;
+                const date = new Date();
+                const fullDate = date.toLocaleDateString();
+                const hour = date.getHours();
+                const minutes = date.getMinutes();
 
-            //     const ticket = {
-            //         _code: `${generateCode()}`,
-            //         amount,
-            //         purchase_datetime: purchase_datetime,
-            //         purchaser: email
-            //     }
-            //     this.tickets.push(ticket)
-            //     await modelTicket.create(ticket);
-            // }
+                const purchase_datetime = `Fecha: ${fullDate} / Hora: ${hour}:${minutes}`;
+
+                const ticket = {
+                    _code: _id,
+                    amount,
+                    purchase_datetime: purchase_datetime,
+                    purchaser: email
+                }
+                this.tickets.push(ticket)
+                await modelTicket.create(ticket);
+            }
         } catch (err) {
             console.error('Existe un error al intentar agregar tu producto al carrito', err)
         }
     }
 
 }
-
 
 
 

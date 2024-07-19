@@ -8,6 +8,7 @@ import { jwtRouter } from "./routes/auth/jwt.routes.js";
 import { ProductRouter } from "./routes/custom/router/routes/productRouter.routes.js";
 import { routerTicket } from "./routes/ticket.routes.js";
 import { MongoSingleton } from "./services/db/mongo.singleton.js";
+import { routereMAIL } from "./routes/orders.routes.js";
 import express from 'express'
 import handlebars from 'express-handlebars';
 import cookieParser from "cookie-parser";
@@ -53,6 +54,7 @@ const httpServer = app.listen(config.PORT, async () => {
     app.use('/api', cookieRoute);
     app.use('/api/auth', jwtRouter);
     app.use('/api', routerTicket);
+    app.use('/api', routereMAIL)
 
     //Custom routes
 

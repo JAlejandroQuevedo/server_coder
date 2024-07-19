@@ -31,6 +31,11 @@ const config = {
     GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
     GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
     GITHUB_CALLBACK_URL: process.env.GITHUB_CALLBACK_URL,
+    GMAIL_APP_USER: process.env.GMAIL_APP_USER || process.env.GMAIL_APP_USER_2,
+    GMAIL_APP_PASS: process.env.GMAIL_APP_PASS,
+    TWILIO_SID: process.env.TWILIO_SID,
+    TWILIO_TOKEN: process.env.TWILIO_TOKEN,
+    TWILIO_PHONE: process.env.TWILIO_PHONE,
     PERSISTENCE: 'mongo'
 }
 

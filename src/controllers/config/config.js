@@ -24,7 +24,6 @@ const config = {
     PORT: process.env.PORT || clOptions.port || 5050,
     // DIRNAME: path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:\/)/, '$1')),
     DIRNAME: url.fileURLToPath(new URL('../../', import.meta.url)),
-    // UPLOAD_DIR: 'public/img'
     get UPLOAD_DIR() { return `${this.DIRNAME}/public/img` },
     MONGODB_ID_REGEX: /^[a-fA-F0-9]{24}$/,
     MONGODB_URI: process.env.MONGODB_URI,
@@ -33,9 +32,6 @@ const config = {
     GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
     GITHUB_CALLBACK_URL: process.env.GITHUB_CALLBACK_URL,
     PERSISTENCE: 'mongo'
-    // MONGODB_URI: 'mongodb+srv://coder_53160:coder2024@clustercoder.sxqjiud.mongodb.net/coder_53160',
 }
 
-//usuario:clave@mongodb://127.0.0.1:27017/proyecto_coder ==> Manera de acceder a una base con usuario y clave
 export { config }
-// ed40cc74184194682fd2787da69dc3f410576e96 => Client secret

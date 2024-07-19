@@ -1,5 +1,5 @@
-import modelProducts from "../factory/dao.factory.js";
-// import { modelProducts } from "../models/products.model.js";
+// import modelProducts from "../factory/dao.factory.js";
+import { modelProducts } from "../models/products.model.js";
 
 // const modelProducts = new ProductsService()
 

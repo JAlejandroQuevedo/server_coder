@@ -1,5 +1,4 @@
 import { modelTicket } from "../models/ticket.model.js";
-import { modelCart } from "../models/cart.model.js";
 import { modelUsers } from "../models/users.model.js";
 import { generateCode } from "../../../services/utils/code.js";
 
@@ -44,7 +43,6 @@ class ColectionManagerTicket {
                     minutes = min
                 }
                 const purchase_datetime = `Fecha: ${fullDate} / Hora: ${hour}:${minutes}`;
-
                 const ticket = {
                     _product_id,
                     _code: `${generateCode()}`,

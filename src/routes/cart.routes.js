@@ -40,11 +40,13 @@ routerCart.get('/carts', async (req, res) => {
         res.status(500).send('Error interno del servidor')
     }
 })
-routerCart.get('/historial', handlePolicies(['admin']), async (req, res) => {
+routerCart.get('/historial/:_uid', handlePolicies(['admin']), async (req, res) => {
     try {
         const limit = +req.query.limit || 0;
+        const { _uid } = req.params;
+
         if (limit <= modelCart.length) {
-            const historial = await ColectionManagerCart.getHistorial(limit);
+            const historial = await ColectionManagerCart.getHistorial(_uid, limit);
             res.send({
                 status: 1,
                 historial
@@ -52,7 +54,10 @@ routerCart.get('/historial', handlePolicies(['admin']), async (req, res) => {
             const historialCart = await ColectionManagerCart.getHistorial();
             socketServer.emit('historialCart', historialCart);
         } else {
-            res.status(400).json('Lo siento, no contamos con la cantidad de productos solicitada');
+            res.status(400).json({
+                status: 0,
+                message: 'Lo siento, favor de ingresar la cantidad correcta de datos que se necesitan'
+            });
         }
     } catch (err) {
         console.error('Error al obtener los productos', err);

@@ -21,29 +21,29 @@ class ColectionManagerCart {
             console.error('Error al leer el archivo', error)
         }
     }
-    // static async getProducts(_user_id, limit) {
-    //     try {
-    //         if (limit) {
-    //             const products = await modelCart.find({})
-    //             this.cart = products;
-    //             return limit === 0 ? products : products.slice(0, limit);
-    //         } else {
-    //             const products = await modelCart.find()
-    //             return products;
-    //         }
-    //     }
-    //     catch (error) {
-    //         console.error('Error al leer el archivo', error)
-    //     }
-    // }
-    static async getHistorial(limit) {
+    static async getProducts(_user_id, limit) {
         try {
             if (limit) {
-                const products = await cartHistorial.find()
+                const products = await modelCart.find({})
                 this.cart = products;
                 return limit === 0 ? products : products.slice(0, limit);
             } else {
-                const products = await cartHistorial.find()
+                const products = await modelCart.find()
+                return products;
+            }
+        }
+        catch (error) {
+            console.error('Error al leer el archivo', error)
+        }
+    }
+    static async getHistorial(_uid, limit) {
+        try {
+            if (limit) {
+                const products = await cartHistorial.find({ _user_id: _uid });
+                this.cart = products;
+                return limit === 0 ? products : products.slice(0, limit);
+            } else {
+                const products = await cartHistorial.find({ _user_id: _uid });
                 return products;
             }
         }

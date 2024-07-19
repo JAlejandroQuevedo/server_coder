@@ -92,7 +92,7 @@ routerCart.get('/carts/:id', async (req, res) => {
         })
     }
     catch (err) {
-        console.error('Error al obtener el producto carrito por _id', err);
+        console.error('Error al obtener el producto carrito por _id', err.message);
         res.status(500).json('Error interno del servidor')
     }
 })

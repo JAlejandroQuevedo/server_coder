@@ -1,23 +1,12 @@
 import { Router } from 'express';
-import nodemailer from 'nodemailer'
-import twilio from 'twilio';
+import { transport_nodemailer } from '../services/utils/nodemailer.js';
 import { config } from '../controllers/config/config.js';
-
 const routereMAIL = Router();
-const transport = nodemailer.createTransport({
-    service: 'gmail',
-    port: 587,
-    auth: {
-        user: config.GMAIL_APP_USER,
-        pass: config.GMAIL_APP_PASS
-    }
-});
 
-const twilioClient = twilio(config.TWILIO_SID, config.TWILIO_TOKEN);
 
 routereMAIL.get('/mail', async (req, res) => {
     try {
-        const confirmation = await transport.sendMail({
+        const confirmation = await transport_nodemailer.sendMail({
             from: `Sistema Coder <${config.GMAIL_APP_USER}>`, // email origen
             to: 'alejandrocabrera245@hotmail.com',
             subject: 'Confirmacion de registro de usuario',

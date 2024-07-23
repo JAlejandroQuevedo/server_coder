@@ -139,6 +139,7 @@ class ColectionManagerCart {
         try {
             const filter = id;
             const updateOne = update;
+
             const options = { new: true }
             const process = await modelCart.findByIdAndUpdate(filter, updateOne, options)
             return process
@@ -165,7 +166,7 @@ class ColectionManagerCart {
     static async deleteProductById(id, cid) {
         try {
             const filter = id;
-            const filterProduct = cid
+            const filterProduct = cid;
             const process = await modelCart.findOneAndDelete(filter);
             const processProducts = await modelCart.findByIdAndDelete(filterProduct)
             return process, processProducts

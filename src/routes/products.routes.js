@@ -5,6 +5,7 @@ import { modelProducts } from '../controllers/dao/models/products.model.js';
 import { CollectionManager } from '../controllers/dao/manager/manager.mdb.js';
 import { handlePolicies } from '../services/utils/policies.js';
 import { verifyRequiredBodyProducts } from '../services/utils/verifyRequiredBodyProducts.js';
+import { verifyMongoDBId } from '../services/utils/verify_mongo_id.js';
 // import CollectionManager from '../controllers/dao/factory/manager/products.manager.js'
 
 
@@ -56,7 +57,7 @@ routerProducts.get('/products', async (req, res) => {
     }
 })
 // routerProducts.get('products/auth',)
-routerProducts.get('/products/:id', async (req, res) => {
+routerProducts.get('/products/:id', verifyMongoDBId('id'), async (req, res) => {
     try {
         const { id } = req.params;
         const product = await CollectionManager.getProductById(id);
@@ -109,7 +110,7 @@ routerProducts.post('/products', uploader.single('thumbnail'), handlePolicies(["
 })
 
 
-routerProducts.put('/products/:id', handlePolicies(["admin"]), async (req, res) => {
+routerProducts.put('/products/:id', handlePolicies(["admin"]), verifyMongoDBId('id'), async (req, res) => {
     try {
         const filter = { _id: req.params.id }
         const update = req.body;
@@ -122,7 +123,7 @@ routerProducts.put('/products/:id', handlePolicies(["admin"]), async (req, res) 
         res.status(500).send('Error al interno en el servidor');
     }
 })
-routerProducts.delete('/products/:id', handlePolicies(["admin"]), async (req, res) => {
+routerProducts.delete('/products/:id', handlePolicies(["admin"]), verifyMongoDBId('id'), async (req, res) => {
     try {
         const filter = { _id: req.params.id };
         await CollectionManager.deleteProductById(filter);

@@ -3,6 +3,7 @@ import { modelCart } from "../controllers/dao/models/cart.model.js";
 import { ColectionManagerCart } from "../controllers/dao/manager/managerCart.mdb.js";
 import { socketServer } from "../index.js";
 import { handlePolicies } from "../services/utils/policies.js";
+import { verifyMongoDBId } from "../services/utils/verify_mongo_id.js";
 
 
 const routerCart = Router()
@@ -109,7 +110,7 @@ routerCart.get('/purchase', async (req, res) => {
         res.status(500).json('Error interno en el servidor')
     }
 })
-routerCart.post('/carts/:id', handlePolicies(['user']), async (req, res) => {
+routerCart.post('/carts/:id', handlePolicies(['user']), verifyMongoDBId("id"), async (req, res) => {
     try {
         const { id } = req.params
         const _user_id = req.session.user._id;
@@ -122,19 +123,8 @@ routerCart.post('/carts/:id', handlePolicies(['user']), async (req, res) => {
         res.status(500).json('Error interno en el servidor')
     }
 })
-routerCart.put('/carts/:id', handlePolicies(['user']), async (req, res) => {
-    try {
-        const { id } = req.params
-        await ColectionManagerCart.addToCart(id)
-        res.status(200).send('Producto agregado con exito al carrito');
-        const productsCart = await ColectionManagerCart.getProducts();
-        socketServer.emit('productsCart', productsCart)
-    } catch (err) {
-        console.error('Error al ingresar el producto, favor de que exista en el total de productoss', err);
-        res.status(500).json('Error interno en el servidor')
-    }
-})
-routerCart.put('/carts/:id', handlePolicies(['user']), async (req, res) => {
+
+routerCart.put('/carts/:id', handlePolicies(['user']), verifyMongoDBId("id"), async (req, res) => {
     try {
         const filter = { _id: req.params.id }
         const update = req.body;
@@ -147,7 +137,7 @@ routerCart.put('/carts/:id', handlePolicies(['user']), async (req, res) => {
         res.status(500).send('Error al interno en el servidor');
     }
 })
-routerCart.put('/carts/:id/products/:cid', handlePolicies(['user']), async (req, res) => {
+routerCart.put('/carts/:id/products/:cid', handlePolicies(['user']), verifyMongoDBId('id'), async (req, res) => {
     try {
         const filter = { _id: req.params.id }
         const quantity = +req.params.cid;
@@ -162,7 +152,7 @@ routerCart.put('/carts/:id/products/:cid', handlePolicies(['user']), async (req,
 }
 )
 
-routerCart.delete('/carts/:id/products/:cid', async (req, res) => {
+routerCart.delete('/carts/:id', verifyMongoDBId('id'), async (req, res) => {
     try {
         const filter = { _id: req.params.id };
         const filterProducts = { _product_id: req.params.cid }
@@ -176,11 +166,11 @@ routerCart.delete('/carts/:id/products/:cid', async (req, res) => {
         res.status(500).send('Error interno del servidor')
     }
 })
-routerCart.delete('/carts/:cid', async (req, res) => {
+routerCart.delete('/carts/delete', async (req, res) => {
     try {
         if (req.params.cid) {
             await ColectionManagerCart.deleteAll();
-            res.status(200).send('Productos eliminado correctamente, el carrito esta vacio');
+            res.status(200).send('Productos eliminados correctamente, el carrito esta vacio');
             const productsCart = await ColectionManagerCart.getProducts();
             socketServer.emit('productsCart', productsCart)
         } else {

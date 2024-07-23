@@ -1,7 +1,8 @@
 import passport from "passport";
 import { config } from "../../controllers/config/config.js";
 import { Router } from "express";
-import { verifyRequiredBody, adminAuth } from "../../controllers/middleWars/middleSession.js";
+import { verifyRequiredBody } from "../../services/utils/verifyRequiredBody.js";
+import { adminAuth } from "../../services/utils/adminAuth.js";
 import { initAuthStrategies } from "../../auth/passport.strategies.js";
 import { ManagerLogin } from "../../controllers/dao/manager/managerLogin.mdb.js";
 const sesionPassport = Router()

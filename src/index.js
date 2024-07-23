@@ -8,13 +8,15 @@ import { jwtRouter } from "./routes/auth/jwt.routes.js";
 import { ProductRouter } from "./routes/custom/router/routes/productRouter.routes.js";
 import { routerTicket } from "./routes/ticket.routes.js";
 import { MongoSingleton } from "./services/db/mongo.singleton.js";
-import { routereMAIL } from "./routes/orders.routes.js";
+import { mockingProducts } from "./routes/mockingProducts.routes.js";
+// import { routereMAIL } from "./routes/orders.routes.js";
 import express from 'express'
 import handlebars from 'express-handlebars';
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import MongoStore from "connect-mongo";
 import cors from "cors"
+import errorsHandler from "./services/error/errors.handler.js";
 //Servidor
 
 const app = express();
@@ -54,7 +56,8 @@ const httpServer = app.listen(config.PORT, async () => {
     app.use('/api', cookieRoute);
     app.use('/api/auth', jwtRouter);
     app.use('/api', routerTicket);
-    app.use('/api', routereMAIL)
+    app.use(mockingProducts)
+    // app.use('/api', routereMAIL)
 
     //Custom routes
 
@@ -63,7 +66,10 @@ const httpServer = app.listen(config.PORT, async () => {
     app.use('/', routerHandle);
     // app.use('/static', express.static('public'))
 
+
     app.use('/static', express.static(`${config.DIRNAME}/public`));
+    //Manejo de errorers
+    app.use(errorsHandler);
     console.log(`Servidor activo en puerto ${config.PORT} enlazada a bbdd`);
 })
 

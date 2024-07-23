@@ -4,6 +4,7 @@ import { socketServer } from '../index.js';
 import { modelProducts } from '../controllers/dao/models/products.model.js';
 import { CollectionManager } from '../controllers/dao/manager/manager.mdb.js';
 import { handlePolicies } from '../services/utils/policies.js';
+import { verifyRequiredBodyProducts } from '../services/utils/verifyRequiredBodyProducts.js';
 // import CollectionManager from '../controllers/dao/factory/manager/products.manager.js'
 
 
@@ -93,7 +94,7 @@ routerProducts.get('/products/pages/:page', async (req, res) => {
         res.status(500).json('Error interno del servidor')
     }
 })
-routerProducts.post('/products', uploader.single('thumbnail'), handlePolicies(["admin"]), async (req, res) => {
+routerProducts.post('/products', uploader.single('thumbnail'), handlePolicies(["admin"]), verifyRequiredBodyProducts(['title', 'description', 'price', 'category', 'code', 'stock']), async (req, res) => {
     try {
         const { title, description, price, category, code, stock } = req.body;
         const thumbnail = req.file.destination;

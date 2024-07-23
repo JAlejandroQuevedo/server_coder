@@ -2,10 +2,12 @@ import passport from "passport";
 import { Router } from "express";
 import { config } from "../../controllers/config/config.js";
 import { createToken, verifyToken } from "../../services/utils/jwtUtil.js";
-import { verifyRequiredBody, adminAuth } from "../../controllers/middleWars/middleSession.js";
+import { verifyRequiredBodyAuth } from "../../services/utils/verifyRequiredBodyAuth.js";
+import { adminAuth } from "../../services/utils/adminAuth.js";
 import { ManagerLogin } from "../../controllers/dao/manager/managerLogin.mdb.js";
 import { createHash, isValidPassword } from "../../services/utils/bycript.js";
 import { initAuthStrategies } from "../../auth/passport.strategies.js";
+
 const jwtRouter = Router()
 initAuthStrategies()
 jwtRouter.get('/users', async (req, res) => {
@@ -21,10 +23,10 @@ jwtRouter.get('/users', async (req, res) => {
         res.status(500).json('Error interno del servidor')
     }
 })
-jwtRouter.post('/register', verifyRequiredBody(['name', 'lastName', 'email', 'password']), async (req, res) => {
+jwtRouter.post('/register', verifyRequiredBodyAuth(['name', 'lastName', 'email', 'password']), async (req, res) => {
     try {
         const { name, lastName, email, gender, password } = req.body;
-        const foundUser = await ManagerLogin.getOne({ email: email })
+        const foundUser = await ManagerLogin.getOne({ email: email });
         if (!foundUser) {
             const passwordHash = createHash(password);
             await ManagerLogin.addUser(name, lastName, email, gender, passwordHash);
@@ -41,7 +43,7 @@ jwtRouter.post('/register', verifyRequiredBody(['name', 'lastName', 'email', 'pa
     }
 
 });
-jwtRouter.post('/jwtlogin', verifyRequiredBody(['email', 'password']), passport.authenticate('login', { failureRedirect: `/login?error=${encodeURI('Usuario o clave no válidos')}` }), async (req, res) => {
+jwtRouter.post('/jwtlogin', verifyRequiredBodyAuth(['email', 'password']), passport.authenticate('login', { failureRedirect: `/login?error=${encodeURI('Usuario o clave no válidos')}` }), async (req, res) => {
     try {
         const token = createToken(req.user, '1h');
         res.cookie(`${config.APP_NAME}_cookie`, token, { maxAge: 60 * 60 * 1000, httpOnly: true });

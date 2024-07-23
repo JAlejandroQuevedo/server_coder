@@ -1,7 +1,8 @@
 import { Router } from "express";
 import { config } from "../../controllers/config/config.js";
 import { ManagerLogin } from "../../dao/manager/managerLogin.mdb.js"
-import { verifyRequiredBody, adminAuth } from "../../controllers/middleWars/middleSession.js";
+import { verifyRequiredBody } from "../../services/utils/verifyRequiredBody.js";
+import { adminAuth } from "../../services/utils/adminAuth.js";
 import { createHash, isValidPassword } from "../../services/utils/bycript.js";
 import { initAuthStrategies } from '../../auth/passport.strategies.js'
 

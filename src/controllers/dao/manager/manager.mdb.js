@@ -14,8 +14,10 @@ class CollectionManager {
                 this.products = products;
                 return limit === 0 ? products : products.slice(0, limit);
             } else {
-                const products = await modelProducts.find()
+                const products = await modelProducts.find();
+                // req
                 return products;
+
             }
         }
         catch (error) {

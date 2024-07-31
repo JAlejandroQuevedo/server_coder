@@ -9,6 +9,7 @@ import { ProductRouter } from "./routes/custom/router/routes/productRouter.route
 import { routerTicket } from "./routes/ticket.routes.js";
 import { MongoSingleton } from "./services/db/mongo.singleton.js";
 import { mockingProducts } from "./routes/mockingProducts.routes.js";
+import { loggerTest } from "./routes/logger_test.routes.js";
 // import { routereMAIL } from "./routes/orders.routes.js";
 import express from 'express'
 import handlebars from 'express-handlebars';
@@ -17,6 +18,7 @@ import session from "express-session";
 import MongoStore from "connect-mongo";
 import cors from "cors"
 import errorsHandler from "./services/error/errors.handler.js";
+import addLogger from "./services/log/logger.js";
 //Servidor
 
 const app = express();
@@ -51,12 +53,14 @@ const httpServer = app.listen(config.PORT, async () => {
     app.set('view engine', 'handlebars');
 
     //General routes
+    app.use(addLogger)
     app.use('/api', routerProducts);
     app.use('/api', routerCart);
     app.use('/api', cookieRoute);
     app.use('/api/auth', jwtRouter);
     app.use('/api', routerTicket);
-    app.use(mockingProducts)
+    app.use(mockingProducts);
+    app.use(loggerTest);
     // app.use('/api', routereMAIL)
 
     //Custom routes
@@ -70,7 +74,7 @@ const httpServer = app.listen(config.PORT, async () => {
     app.use('/static', express.static(`${config.DIRNAME}/public`));
     //Manejo de errorers
     app.use(errorsHandler);
-    console.log(`Servidor activo en puerto ${config.PORT} enlazada a bbdd`);
+    console.log(`Servidor activo en puerto ${config.PORT} enlazada a bbdd en mode ${config.MODE}`);
 })
 
 export { socketServer }

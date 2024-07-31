@@ -32,12 +32,14 @@ routerCart.get('/carts', async (req, res) => {
                 cart
             })
             const publicCart = await ColectionManagerCart.getUserCart()
-            socketServer.emit('productsCart', publicCart)
+            socketServer.emit('productsCart', publicCart);
+            req.logger.info('Productos del carrito obtenidos de manera exitosa');
         } else {
+            req.logger.error('Lo siento, no contamos con la cantidad de productos solicitada');
             res.status(400).json('Lo siento, no contamos con la cantidad de productos solicitada');
         }
     } catch (err) {
-        console.error('Error al obtener los productos', err);
+        req.logger.error('Hubo un error al obtener los pruductos:', err);
         res.status(500).send('Error interno del servidor')
     }
 })
@@ -54,6 +56,7 @@ routerCart.get('/historial/:_uid', handlePolicies(['admin']), async (req, res) =
             })
             const historialCart = await ColectionManagerCart.getHistorial();
             socketServer.emit('historialCart', historialCart);
+            req.logger.info('Historial obtenido de manera exitosa');
         } else {
             res.status(400).json({
                 status: 0,
@@ -61,8 +64,8 @@ routerCart.get('/historial/:_uid', handlePolicies(['admin']), async (req, res) =
             });
         }
     } catch (err) {
-        console.error('Error al obtener los productos', err);
-        res.status(500).send('Error interno del servidor')
+        req.logger.error('Error al obtener el historial del carrito:', err);
+        res.status(500).send('Error interno del servidor');
     }
 })
 routerCart.get('/carts/page/:page', async (req, res) => {
@@ -73,9 +76,10 @@ routerCart.get('/carts/page/:page', async (req, res) => {
             origin: 'server1',
             cart: product
         })
+        req.logger.info('Productos del carrito obtenidos de manera exitosa');
     }
     catch (err) {
-        console.error('Error al obtener el carrito en la pagina solicitada', err);
+        req.logger.error('Error al obtener los datos del carrito de la pagina solicitada', err);
         res.status(500).json('Error interno del servidor')
     }
 })
@@ -84,6 +88,7 @@ routerCart.get('/carts/:id', async (req, res) => {
         const { id } = req.params;
         const product = await ColectionManagerCart.getProductCartById(id);
         if (!product) {
+            req.logger.error('El producto solicitado no existe');
             res.status(404).json('Lo siento, el producto no existe en el carrito')
             return;
         }
@@ -91,9 +96,10 @@ routerCart.get('/carts/:id', async (req, res) => {
             origin: 'server1',
             cart: product
         })
+        req.logger.info('Producto obtenido de manera exitosa');
     }
     catch (err) {
-        console.error('Error al obtener el producto carrito por _id', err.message);
+        req.logger.error('Error al cargar el obtener por ID:', err);
         res.status(500).json('Error interno del servidor')
     }
 })
@@ -103,10 +109,11 @@ routerCart.get('/purchase', async (req, res) => {
         await ColectionManagerCart.endPurchase(_user_id);
         res.status(200).send('Compra finalizada con exito');
         const productsCart = await ColectionManagerCart.getProducts();
-        socketServer.emit('productsCart', productsCart)
+        socketServer.emit('productsCart', productsCart);
+        req.logger.info('Compra finalizada con exito');
     }
     catch (err) {
-        console.error('Error al ingresar el producto, favor de que exista en el total de productoss', err);
+        req.logger.error('Error al agregar el producto:', err);
         res.status(500).json('Error interno en el servidor')
     }
 })
@@ -117,9 +124,10 @@ routerCart.post('/carts/:id', handlePolicies(['user']), verifyMongoDBId("id"), a
         await ColectionManagerCart.addToCart(id, _user_id)
         res.status(200).send('Producto agregado con exito al carrito');
         const productsCart = await ColectionManagerCart.getProducts();
-        socketServer.emit('productsCart', productsCart)
+        socketServer.emit('productsCart', productsCart);
+        req.logger.info('Producto agregado con exito al carrito');
     } catch (err) {
-        console.error('Error al ingresar el producto, favor de que exista en el total de productoss', err);
+        req.logger.error('Error al agregar el producto:', err);
         res.status(500).json('Error interno en el servidor')
     }
 })
@@ -131,9 +139,10 @@ routerCart.put('/carts/:id', handlePolicies(['user']), verifyMongoDBId("id"), as
         await ColectionManagerCart.updateProduct(filter, update);
         res.status(200).send('Producto actualizado con exito');
         const productsCart = await ColectionManagerCart.getProducts();
-        socketServer.emit('productsCart', productsCart)
+        socketServer.emit('productsCart', productsCart);
+        req.logger.info('Producto actualizado con exito');
     } catch (err) {
-        console.error('Error al actualizar el producto por _id, favor de revisar', err);
+        req.logger.error('Error al actualizar el producto por ID', err);
         res.status(500).send('Error al interno en el servidor');
     }
 })
@@ -144,9 +153,10 @@ routerCart.put('/carts/:id/products/:cid', handlePolicies(['user']), verifyMongo
         await ColectionManagerCart.updateProductQuantity(filter, quantity);
         res.status(200).send('Cantidad del producto actualizada con exito');
         const productsCart = await ColectionManagerCart.getProducts();
-        socketServer.emit('productsCart', productsCart)
+        socketServer.emit('productsCart', productsCart);
+        req.logger.info('Cantidad del producto actualizada con exito');
     } catch (err) {
-        console.error('Error al actualizar la cantidad del producto, favor de revisar la solicitud', err);
+        req.logger.error('Error al actualizar la cantidad del producto: ', err);
         res.status(500).send('Error al interno en el servidor');
     }
 }
@@ -159,10 +169,11 @@ routerCart.delete('/carts/:id', verifyMongoDBId('id'), async (req, res) => {
         await ColectionManagerCart.deleteProductById(filter, filterProducts);
         res.status(200).send('Producto eliminado correctamente');
         const productsCart = await ColectionManagerCart.getProducts();
-        socketServer.emit('productsCart', productsCart)
+        socketServer.emit('productsCart', productsCart);
+        req.logger.info('Producto eliminado correctamente');
     }
     catch (err) {
-        console.error('Lo siento no se pudo eliminar el producto, favor de revisar _id');
+        req.logger.error('Lo siento no se pudo eliminar el producto', err);
         res.status(500).send('Error interno del servidor')
     }
 })
@@ -172,16 +183,16 @@ routerCart.delete('/carts/delete', async (req, res) => {
             await ColectionManagerCart.deleteAll();
             res.status(200).send('Productos eliminados correctamente, el carrito esta vacio');
             const productsCart = await ColectionManagerCart.getProducts();
-            socketServer.emit('productsCart', productsCart)
+            socketServer.emit('productsCart', productsCart);
+            req.logger.info('Productos eliminados correctamente');
+
         } else {
-            console.error('Por favor ingresa un valor valido')
+            req.logger.error('Lo siento no se pudieron eliminar los productos');
         }
     }
     catch (err) {
-        console.error('Lo siento no se pudo eliminar el producto, favor de revisar la solicitud');
+        req.logger.error('Lo siento no se pudieron eliminar los productos', err);
         res.status(500).send('Error interno del servidor');
-        const productsCart = await ColectionManagerCart.getProducts();
-        socketServer.emit('productsCart', productsCart)
     }
 })
 export { routerCart }

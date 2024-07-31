@@ -24,6 +24,7 @@ const config = {
     PORT: process.env.PORT || clOptions.port || 5050,
     // DIRNAME: path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:\/)/, '$1')),
     DIRNAME: url.fileURLToPath(new URL('../../', import.meta.url)),
+    DIRNAME_LOG: url.fileURLToPath(new URL('../../services/log/register', import.meta.url)),
     get UPLOAD_DIR() { return `${this.DIRNAME}/public/img` },
     MONGODB_ID_REGEX: /^[a-fA-F0-9]{24}$/,
     MONGODB_URI: process.env.MONGODB_URI,
@@ -36,7 +37,8 @@ const config = {
     TWILIO_SID: process.env.TWILIO_SID,
     TWILIO_TOKEN: process.env.TWILIO_TOKEN,
     TWILIO_PHONE: process.env.TWILIO_PHONE,
-    PERSISTENCE: 'mongo'
+    PERSISTENCE: 'mongo',
+    MODE: clOptions.mode || 'dev'
 }
 
 export { config }

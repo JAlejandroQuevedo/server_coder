@@ -36,6 +36,7 @@ routerProducts.get('/products/sort/:sort', async (req, res) => {
 routerProducts.get('/products', async (req, res) => {
     try {    //NOTA: Si agregas el query despues del /products sin query, te arroja todos los productos aunque el codigo este correcto
         const limit = +req.query.limit || 0
+        // const req_pro = 
         if (limit <= modelProducts.length) {
             const products = await CollectionManager.getProducts(limit);
             res.send({
@@ -44,16 +45,16 @@ routerProducts.get('/products', async (req, res) => {
             })
             const product = await CollectionManager.getProducts();
             socketServer.emit('products', product);
-            console.log(req.session.user)
-
-
+            req.logger.info('Productos obtenidos de manera exitosa');
         } else {
+            req.logger.error('Lo siento, no contamos con la cantidad de productos solicitada');
             res.status(404).json('Lo siento, no contamos con la cantidad de productos solicitada');
+
         }
     }
     catch (err) {
-        console.error('Error al obtener los productos', err)
-        res.status(500).send('Error interno del servidor')
+        req.logger.error('Hubo un error al obtener los pruductos:', err);
+        res.status(500).send('Error interno del servidor');
     }
 })
 // routerProducts.get('products/auth',)
@@ -63,6 +64,7 @@ routerProducts.get('/products/:id', verifyMongoDBId('id'), async (req, res) => {
         const product = await CollectionManager.getProductById(id);
         //NOTA: Req params devuelve una cadena, no un numero
         if (!product) {
+            req.logger.error('El producto solicitado no existe');
             res.status(404).json('Lo siento, el producto no existe');
             return;
         }
@@ -72,9 +74,11 @@ routerProducts.get('/products/:id', verifyMongoDBId('id'), async (req, res) => {
         })
         const productSocket = await CollectionManager.getProducts();
         socketServer.emit('products', productSocket);
+        req.logger.info('Producto obtenido de manera exitosa');
+
     }
     catch (err) {
-        console.error('Error al cargar el obtener por ID: ', err);
+        req.logger.error('Error al cargar el obtener por ID:', err);
         res.status(500).json('Error interno del servidor')
     }
 })
@@ -89,9 +93,10 @@ routerProducts.get('/products/pages/:page', async (req, res) => {
         })
         const product = await CollectionManager.getProducts();
         socketServer.emit('products', product);
+        req.logger.info('Productos obtenidos de manera exitosa');
     }
     catch (err) {
-        console.error('Error al obtener los datos de la pagina solicitada', err);
+        req.logger.error('Error al obtener los datos de la pagina solicitada', err);
         res.status(500).json('Error interno del servidor')
     }
 })
@@ -103,8 +108,10 @@ routerProducts.post('/products', uploader.single('thumbnail'), handlePolicies(["
         res.status(201).send('Producto agregado con exito');
         const products = await CollectionManager.getProducts();
         socketServer.emit('products', products);
+        req.logger.info('Producto agregado con exito');
+
     } catch (err) {
-        console.error('Error al agregar el producto: ', err);
+        req.logger.error('Error al agregar el producto:', err);
         res.status(500).json('Error interno en el servidor');
     }
 })
@@ -118,8 +125,10 @@ routerProducts.put('/products/:id', handlePolicies(["admin"]), verifyMongoDBId('
         res.status(200).send('Producto actualizado con exito');
         const product = await CollectionManager.getProducts();
         socketServer.emit('products', product);
+        req.logger.info('Producto actualizado con exito');
+
     } catch (err) {
-        console.error('Error al actualizar el producto por ID', err);
+        req.logger.error('Error al actualizar el producto por ID', err);
         res.status(500).send('Error al interno en el servidor');
     }
 })
@@ -130,9 +139,11 @@ routerProducts.delete('/products/:id', handlePolicies(["admin"]), verifyMongoDBI
         res.status(200).send('Producto eliminado correctamente');
         const product = await CollectionManager.getProducts();
         socketServer.emit('products', product);
+        req.logger.info('Producto eliminado correctamente');
+
     }
     catch (err) {
-        console.error('Lo siento no se pudo eliminar el producto');
+        req.logger.error('Lo siento no se pudo eliminar el producto:', err);
         res.status(500).send('Error interno del servidor')
     }
 })

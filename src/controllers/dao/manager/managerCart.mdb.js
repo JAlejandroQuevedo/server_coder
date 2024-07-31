@@ -2,6 +2,7 @@ import { modelCart } from "../models/cart.model.js";
 import { modelProducts } from "../models/products.model.js";
 import { cartHistorial } from "../models/cart_historial.model.js";
 import { modelUsers } from "../models/users.model.js";
+import { sendMail } from "../../../services/mail/send.email.js";
 import { config } from "../../config/config.js";
 import { transport_nodemailer } from "../../../services/utils/nodemailer.js";
 
@@ -58,7 +59,6 @@ class ColectionManagerCart {
         try {
             const productCart = await modelCart.find({ _user_id: _user_id });
             const user = await modelUsers.findById(_user_id);
-            console.log(user)
             if (productCart.length > 0) {
                 const cart = productCart.map(({ _product_id, quantity }) => ({ _product_id, quantity }));
                 const products = await Promise.all(cart.map(async (productFind) => {
@@ -67,16 +67,14 @@ class ColectionManagerCart {
                 return await Promise.all(products.map(async ({ stock }) => {
                     cart.map(async ({ _product_id, quantity }) => {
                         if (stock < quantity || quantity > stock) return console.error('El stock es mayor a la cantidad indicada en el carrito, la compra no puede ser procesada');
-                        const confirmation = await transport_nodemailer.sendMail({
-                            from: `Confirmacion de compra<${config.GMAIL_APP_USER}>`,
-                            to: user.email,
-                            subject: 'Confirmacion de compra',
-                            html: `
-                            <h1>¡Compra realizada con exito!</h1>
-                            
+                        await sendMail(
+                            'Confirmacion de compra',
+                            user.email,
+                            'Confirmacion de compra',
                             `
-                        });
-                        console.log(confirmation);
+                                <h1>¡Compra realizada con exito!</h1>
+                            `
+                        )
                         const newStock = +stock - quantity;
                         await modelProducts.updateOne({ _id: _product_id }, { $set: { stock: `${newStock}` } });
                         await modelCart.findOneAndDelete({ _user_id: _user_id })

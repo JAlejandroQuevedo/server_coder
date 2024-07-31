@@ -17,20 +17,20 @@ config:
 scenarios:
   - name: "Sessions Flow (api/marketplace)"
     flow:
-      - log: "Creating variables for user"
-      - get:
-          url: '/api/auth/users'
-          capture:
-            - json: "$.name"
-              as: "name"
-            - json: "$.lastName"
-              as: "lastName"
-            - json: "$.email"
-              as: "email"
-            - json: "$.gender"
-              as: "gender"
-            - json: "$.password"
-              as: "password"
+      # - log: "Creating variables for user"
+      # - get:
+      #     url: '/api/auth/users'
+      #     capture:
+      #       - json: "$.name"
+      #         as: "name"
+      #       - json: "$.lastName"
+      #         as: "lastName"
+      #       - json: "$.email"
+      #         as: "email"
+      #       - json: "$.gender"
+      #         as: "gender"
+      #       - json: "$.password"
+      #         as: "password"
       - log: "Registering user"
       - post:
           url: "/api/auth/register"

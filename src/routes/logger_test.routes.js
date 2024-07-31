@@ -13,7 +13,7 @@ loggerTest.get('/loggerTest', async (req, res) => {
     try {
         const scriptPath = './config.yml';
         const outputPath = `${config.DIRNAME_LOG}/artillery_test_output_${generateCode()}.json`
-        exec(`artillery run--verbose ${scriptPath} - o ${outputPath}`, (error, stdout, stderr) => {
+        exec(`artillery run ${scriptPath} -o ${outputPath}`, (error, stdout, stderr) => {
             if (error) {
                 console.error(`Error executing Artillery: ${error.message}`);
                 return res.status(500).send(`Error executing Artillery: ${error.message}`);

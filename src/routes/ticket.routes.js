@@ -12,7 +12,7 @@ routerTicket.get('/tickets', async (req, res) => {
             origin: config.PORT,
             tickets: tickets
         })
-        req.logger.info('Tickets obtenidos de manera exitosa');
+        req.logger.info('Productos obtenidos de manera exitosa');
     }
     catch (err) {
         req.logger.error('Hubo un error al obtener los tickes:', err);

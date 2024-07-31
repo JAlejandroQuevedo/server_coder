@@ -17,10 +17,10 @@ jwtRouter.get('/users', async (req, res) => {
             origin: config.PORT,
             users: users
         })
+        req.logger.info('Usuarios obtenidos de manera exitosa');
     }
     catch (err) {
-        console.error('Existe un error al obtener los usuarios', err)
-        res.status(500).json('Error interno del servidor')
+        req.logger.error('Existe un error al obtener los usuarios', err);
     }
 })
 jwtRouter.post('/register', verifyRequiredBodyAuth(['name', 'lastName', 'email', 'password']), async (req, res) => {
@@ -34,10 +34,11 @@ jwtRouter.post('/register', verifyRequiredBodyAuth(['name', 'lastName', 'email',
                 origin: config.PORT,
                 payload: 'Usuario creado de manera exitosa'
             })
+            req.logger.info('Usuario creado de manera exitosa');
         }
     }
     catch (err) {
-        console.error('Existe un error al crear el usuario', err)
+        req.logger.error('Existe un error al crear el usuario', err);
         res.status(500).json('Error interno del servidor')
 
     }
@@ -56,6 +57,7 @@ jwtRouter.post('/jwtlogin', verifyRequiredBodyAuth(['email', 'password']), passp
         }
     } catch (err) {
         res.status(500).send({ origin: config.SERVER, payload: null, error: err.message });
+        req.logger.error({ origin: config.SERVER, payload: null, error: err.message });
     }
 });
 jwtRouter.get('/jwtAuth', verifyToken, passport.authenticate('jwtlogin', { failureRedirect: `/login?error=${encodeURI('Usuario o clave no válidos')}` }), async (req, res) => {
@@ -68,6 +70,7 @@ jwtRouter.get('/jwtAuth', verifyToken, passport.authenticate('jwtlogin', { failu
         });
     } catch (err) {
         res.status(500).send({ origin: config.SERVER, payload: null, error: err.message });
+        req.logger.error({ origin: config.SERVER, payload: null, error: err.message });
     }
 });
 jwtRouter.get('/private', adminAuth, async (req, res) => {
@@ -75,6 +78,7 @@ jwtRouter.get('/private', adminAuth, async (req, res) => {
         res.status(200).send({ origin: config.PORT, payload: 'Bienvenido ADMIN!' });
     } catch (err) {
         res.status(500).send({ origin: config.PORT, payload: null, error: err.message });
+        req.logger.error({ origin: config.SERVER, payload: null, error: err.message });
     }
 });
 
@@ -87,6 +91,7 @@ jwtRouter.get('/logout', async (req, res) => {
         });
     } catch (err) {
         res.status(500).send({ origin: config.PORT, payload: null, error: err.message });
+        req.logger.error({ origin: config.SERVER, payload: null, error: err.message });
     }
 });
 

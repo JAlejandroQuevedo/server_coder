@@ -1,10 +1,19 @@
 config:
-  plugins:
-    metrics-by-endpoint: {}
   target: 'http://localhost:8080'
   phases:
     - duration: 20 # duración total 20 segs
       arrivalRate: 10 # 10 usuarios virtuales por seg
+  plugins:
+    metrics-by-endpoint: {}
+  hooks:
+    afterResponse: |
+      function (req, res, context, events, next) {
+        if (res.statusCode !== 200) {
+          events.emit('counter', 'errors.http.codes.' + res.statusCode, 1);
+          console.error(`Error on ${req.method} ${req.url}: ${res.statusCode}`);
+        }
+        next();
+      }
 scenarios:
   - name: "Sessions Flow (api/marketplace)"
     flow:
@@ -31,6 +40,9 @@ scenarios:
             email: "{{ email }}"
             gender: "{{ gender }}"
             password: "{{ password }}"
+          capture:
+            - json: "$.error"
+              as: "register_error"
       - think: 2
       - log: "Login user"
       - post:
@@ -38,3 +50,8 @@ scenarios:
           json:
             email: "{{ email }}"
             password: "{{ password }}"
+          capture:
+            - json: "$.error"
+              as: "login_error"
+      - log: "Register error: {{ register_error }}"
+      - log: "Login error: {{ login_error }}"

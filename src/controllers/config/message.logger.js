@@ -106,3 +106,5 @@ export const loggers = [
         }
     }
 ]
+// import { loggers } from "./controllers/config/message.logger.js";
+// loggers.map(({ products, carts }) => console.log(carts))

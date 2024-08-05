@@ -64,7 +64,6 @@ const httpServer = app.listen(config.PORT, async () => {
     // app.use('/api', routereMAIL)
 
     //Custom routes
-
     app.use('/api/', new ProductRouter().getRouter());
     //View routes
     app.use('/', routerHandle);
@@ -76,7 +75,6 @@ const httpServer = app.listen(config.PORT, async () => {
     app.use(errorsHandler);
     console.log(`Servidor activo en puerto ${config.PORT} enlazada a bbdd en mode ${config.MODE}`);
 })
-
 
 export { socketServer }
 

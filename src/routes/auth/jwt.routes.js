@@ -94,5 +94,17 @@ jwtRouter.get('/logout', async (req, res) => {
         req.logger.error({ origin: config.SERVER, payload: null, error: err.message });
     }
 });
+jwtRouter.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+jwtRouter.get('/google/callback',
+    passport.authenticate('google', { failureRedirect: '/' }),
+    (req, res) => {
+        req.session.user = req.user;
+        req.session.save(err => {
+            if (err) return res.status(500).send({ origin: config.PORT, payload: null, error: err.message });
+            res.redirect('/profile');
+        });
+    });
+
+
 
 export { jwtRouter }

@@ -29,16 +29,18 @@ const config = {
     MONGODB_ID_REGEX: /^[a-fA-F0-9]{24}$/,
     MONGODB_URI: process.env.MONGODB_URI,
     SECRET: process.env.SECRET,
-    GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
-    GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
-    GITHUB_CALLBACK_URL: process.env.GITHUB_CALLBACK_URL,
     GMAIL_APP_USER: process.env.GMAIL_APP_USER || process.env.GMAIL_APP_USER_2,
     GMAIL_APP_PASS: process.env.GMAIL_APP_PASS,
+    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
     TWILIO_SID: process.env.TWILIO_SID,
     TWILIO_TOKEN: process.env.TWILIO_TOKEN,
     TWILIO_PHONE: process.env.TWILIO_PHONE,
     PERSISTENCE: 'mongo',
-    MODE: clOptions.mode || 'dev'
+    MODE: clOptions.mode || 'dev',
+    CLOUD_NAME: process.env.CLOUD_NAME,
+    API_KEY: process.env.API_KEY,
+    API_SECRET: process.env.API_SECRET
 }
 
 export { config }

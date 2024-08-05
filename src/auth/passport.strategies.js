@@ -1,8 +1,9 @@
 import passport from 'passport';
 import local from 'passport-local';
-import GitHubStrategy from 'passport-github2';
 import jwt from 'passport-jwt';
 import { ManagerLogin } from '../controllers/dao/manager/managerLogin.mdb.js';
+import { modelUsersGoogle } from '../controllers/dao/models/user.google.js';
+import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { isValidPassword, createHash } from '../services/utils/bycript.js';
 import { config } from '../controllers/config/config.js';
 
@@ -25,7 +26,7 @@ const initAuthStrategies = () => {
 
                 if (foundUser && isValidPassword(password, foundUser.password)) {
                     const { _id, name, lastName, email, gender } = foundUser;
-                    const savedRol = "user";
+                    const savedRol = "admin";
                     const userDone = req.session.user = { _id: _id, name: name, lastName: lastName, email: email, gender: gender, role: savedRol };
                     return done(null, userDone);
                 } else {
@@ -59,44 +60,35 @@ const initAuthStrategies = () => {
             }
         }
     ));
-
-    passport.use('ghlogin', new GitHubStrategy(
-        {
-            clientID: config.GITHUB_CLIENT_ID,
-            clientSecret: config.GITHUB_CLIENT_SECRET,
-            callbackURL: config.GITHUB_CALLBACK_URL,
-            scope: ['user:email']
-        },
-        async (req, accessToken, refreshToken, profile, done) => {
-            try {
-                const email = profile._json?.email || null;
-
-
-                if (email) {
-                    const foundUser = await ManagerLogin.getOne({ email: email });
-
-                    if (!foundUser) {
-                        const user = {
-                            name: profile._json.name.split(' ')[0],
-                            lastName: profile._json.name.split(' ')[1],
-                            email: email,
-                            gender: 'none',
-                            password: 'none'
-                        }
-                        console.log(user)
-                        const process = await ManagerLogin.addUser(user);
-                        return done(null, process);
-                    } else {
-                        return done(null, foundUser);
-                    }
-                } else {
-                    return done(new Error('Faltan datos de perfil'), null);
-                }
-            } catch (err) {
-                return done(err, false);
+    passport.use(new GoogleStrategy({
+        clientID: config.GOOGLE_CLIENT_ID,
+        clientSecret: config.GOOGLE_CLIENT_SECRET,
+        callbackURL: '/api/auth/google/callback',
+        passReqToCallback: true
+    }, async (req, accessToken, refreshToken, profile, done) => {
+        const savedRol = "admin";
+        const foundUser = await modelUsersGoogle.find({ email: profile.emails[0].value });
+        if (foundUser.length === 0) {
+            const user = {
+                name: profile.name.givenName,
+                lastName: profile.name.familyName,
+                email: profile.emails[0].value,
             }
+            const { name, lastName, email } = user;
+            const userDone = req.session.user = { name: name, lastName: lastName, email: email, role: savedRol };
+            modelUsersGoogle.create(user);
+            return done(null, userDone);
+        } else {
+            const user = {
+                name: profile.name.givenName,
+                lastName: profile.name.familyName,
+                email: profile.emails[0].value,
+            }
+            const { name, lastName, email } = user;
+            const userDone = req.session.user = { name: name, lastName: lastName, email: email, role: savedRol };
+            return done(null, userDone);
         }
-    ));
+    }));
     passport.use('jwtlogin', new jwtStrategy(
         {
             // Aquí llamamos al extractor de cookie

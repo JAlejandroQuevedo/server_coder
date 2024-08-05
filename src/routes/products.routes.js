@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { uploader } from '../services/uploader/uploader.js';
+import { uploader } from '../services/uploader/uploaderCloudinary.js';
 import { socketServer } from '../index.js';
 import { modelProducts } from '../controllers/dao/models/products.model.js';
 import { CollectionManager } from '../controllers/dao/manager/manager.mdb.js';
@@ -103,7 +103,7 @@ routerProducts.get('/products/pages/:page', async (req, res) => {
 routerProducts.post('/products', uploader.single('thumbnail'), handlePolicies(["admin"]), verifyRequiredBodyProducts(['title', 'description', 'price', 'category', 'code', 'stock']), async (req, res) => {
     try {
         const { title, description, price, category, code, stock } = req.body;
-        const thumbnail = req.file.destination;
+        const thumbnail = req.file.path;
         await CollectionManager.addProduct(title, description, price, category, thumbnail, code, stock);
         res.status(201).send('Producto agregado con exito');
         const products = await CollectionManager.getProducts();

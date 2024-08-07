@@ -10,6 +10,7 @@ import { routerTicket } from "./routes/ticket.routes.js";
 import { MongoSingleton } from "./services/db/mongo.singleton.js";
 import { mockingProducts } from "./routes/mockingProducts.routes.js";
 import { loggerTest } from "./routes/logger_test.routes.js";
+import { logger } from "./services/log/logger.js";
 // import { routereMAIL } from "./routes/orders.routes.js";
 import express from 'express'
 import handlebars from 'express-handlebars';
@@ -73,8 +74,7 @@ const httpServer = app.listen(config.PORT, async () => {
     app.use('/static', express.static(`${config.DIRNAME}/public`));
     //Manejo de errorers
     app.use(errorsHandler);
-    console.log(`Servidor activo en puerto ${config.PORT} enlazada a bbdd en mode ${config.MODE}`);
+    logger.info(`Servidor activo en puerto ${config.PORT} enlazada a bbdd en mode ${config.MODE}`);
 })
-
 export { socketServer }
 

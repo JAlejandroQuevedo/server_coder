@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { config } from '../../controllers/config/config.js';
+import { logger } from '../log/logger.js';
 
 export class MongoSingleton {
     static #instance;
@@ -15,9 +16,9 @@ export class MongoSingleton {
     static getInstance() {
         if (!this.#instance) {
             this.#instance = new MongoSingleton();
-            console.log('Conexión bbdd CREADA');
+            logger.info('Conexión bbdd CREADA');
         } else {
-            console.log('Conexión bbdd RECUPERADA');
+            logger.info('Conexión bbdd RECUPERADA');
         }
 
         return this.#instance;

@@ -65,7 +65,6 @@ jwtRouter.get('/jwtAuth', verifyToken, passport.authenticate('jwtlogin', { failu
         req.session.user = req.user;
         req.session.save(err => {
             if (err) return res.status(500).send({ origin: config.PORT, payload: null, error: err.message });
-
             res.redirect('/profile');
         });
     } catch (err) {

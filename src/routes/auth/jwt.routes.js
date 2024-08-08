@@ -58,6 +58,7 @@ jwtRouter.post('/jwtlogin', verifyRequiredBodyAuth(['email', 'password']), passp
         req.logger.error({ origin: config.SERVER, payload: null, error: err.message });
     }
 });
+
 jwtRouter.get('/jwtAuth', verifyToken, passport.authenticate('jwtlogin', { failureRedirect: `/login?error=${encodeURI('Usuario o clave no válidos')}` }), async (req, res) => {
     try {
         req.session.user = req.user;
@@ -102,6 +103,19 @@ jwtRouter.get('/google/callback',
         });
     });
 
+jwtRouter.post('/recovery', verifyRequiredBodyAuth(['email']), async (req, res) => {
+    try {
+        const { email } = req.body;
+        const foundUser = await ManagerLogin.getOne({ email: email });
+        if (!foundUser) return res.status(401).send({ origin: config.PORT, payload: 'El usuario no esta registrado' });
+        const token = createToken(req.user, '1h');
+        res.cookie(`${config.APP_NAME}_cookie`, token, { maxAge: 60 * 60 * 1000, httpOnly: true });
+        // res.redirect('/api/auth/jwtAuth');
 
+    } catch (err) {
+        res.status(500).send({ origin: config.SERVER, payload: null, error: err.message });
+        req.logger.error({ origin: config.SERVER, payload: null, error: err.message });
+    }
+});
 
 export { jwtRouter }

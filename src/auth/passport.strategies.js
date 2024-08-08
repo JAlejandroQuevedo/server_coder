@@ -60,6 +60,30 @@ const initAuthStrategies = () => {
             }
         }
     ));
+
+    // passport.use('register_2', new localStrategy(
+    //     {
+    //         usernameField: 'email',
+    //         passwordField: 'password',
+    //         passReqToCallback: true
+    //     },
+    //     async (req, username, password, done) => {
+    //         try {
+    //             const foundUser = await ManagerLogin.getOne({ email: username });
+    //             const { name, lastName, email, gender } = req.body;
+    //             if (foundUser) {
+    //                 return done(null, false, { message: 'El correo ya está registrado.' });
+    //             }
+    //             const passwordHash = createHash(password);
+    //             const user = await ManagerLogin.addUser(name, lastName, email, gender, passwordHash);
+
+    //             return done(null, user);
+    //         } catch (err) {
+    //             return done(err);
+    //         }
+    //     }
+    // ));
+
     passport.use(new GoogleStrategy({
         clientID: config.GOOGLE_CLIENT_ID,
         clientSecret: config.GOOGLE_CLIENT_SECRET,

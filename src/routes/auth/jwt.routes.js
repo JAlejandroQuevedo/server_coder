@@ -107,9 +107,16 @@ jwtRouter.post('/recovery', verifyRequiredBodyAuth(['email']), async (req, res) 
     try {
         const { email } = req.body;
         const foundUser = await ManagerLogin.getOne({ email: email });
-        if (!foundUser) return res.status(401).send({ origin: config.PORT, payload: 'El usuario no esta registrado' });
-        const token = createToken(req.user, '1h');
+        if (!foundUser) {
+            return res.status(401).send({ origin: config.PORT, payload: 'El usuario no está registrado' });
+        }
+
+        // Convertir foundUser a un objeto simple si es necesario
+        const userPayload = foundUser.toObject ? foundUser.toObject() : foundUser;
+
+        const token = createToken(userPayload, '1h');
         res.cookie(`${config.APP_NAME}_cookie`, token, { maxAge: 60 * 60 * 1000, httpOnly: true });
+        res.status(200).send({ origin: config.PORT, payload: 'El usuario está registrado' });
         // res.redirect('/api/auth/jwtAuth');
 
     } catch (err) {
@@ -117,6 +124,7 @@ jwtRouter.post('/recovery', verifyRequiredBodyAuth(['email']), async (req, res) 
         req.logger.error({ origin: config.SERVER, payload: null, error: err.message });
     }
 });
+
 
 
 export { jwtRouter }

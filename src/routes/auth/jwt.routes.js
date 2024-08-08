@@ -7,7 +7,7 @@ import { adminAuth } from "../../services/utils/adminAuth.js";
 import { ManagerLogin } from "../../controllers/dao/manager/managerLogin.mdb.js";
 import { createHash, isValidPassword } from "../../services/utils/bycript.js";
 import { initAuthStrategies } from "../../auth/passport.strategies.js";
-
+import { sendMail } from "../../services/mail/send.email.js";
 const jwtRouter = Router()
 initAuthStrategies()
 jwtRouter.get('/users', async (req, res) => {
@@ -113,10 +113,25 @@ jwtRouter.post('/recovery', verifyRequiredBodyAuth(['email']), async (req, res) 
 
         // Convertir foundUser a un objeto simple si es necesario
         const userPayload = foundUser.toObject ? foundUser.toObject() : foundUser;
-
         const token = createToken(userPayload, '1h');
         res.cookie(`${config.APP_NAME}_cookie`, token, { maxAge: 60 * 60 * 1000, httpOnly: true });
-        res.status(200).send({ origin: config.PORT, payload: 'El usuario está registrado' });
+        sendMail('Recuperacion de contraseña', email, 'Por favor haz click en el siguiente enlace', `
+            <h3>Haz click para recuperar la contraseña</h3>
+            <a href="/api/auth/emailAuth">Haz click aqui</a>
+            `)
+        req.logger.info('Email de recuperacion enviado')
+        res.redirect('/api/auth/emailAuth');
+
+    } catch (err) {
+        res.status(500).send({ origin: config.SERVER, payload: null, error: err.message });
+        req.logger.error({ origin: config.SERVER, payload: null, error: err.message });
+    }
+});
+jwtRouter.get('/emailAuth', verifyToken, passport.authenticate('jwtlogin', { failureRedirect: `/login?error=${encodeURI('Token invalido')}` }), async (req, res) => {
+    try {
+        res.status(200).send({ origin: config.PORT, payload: 'listo' });
+        console.log('Here')
+        // res.status(200).send({ origin: config.PORT, payload: 'Confirmacion lista' });
         // res.redirect('/api/auth/jwtAuth');
 
     } catch (err) {

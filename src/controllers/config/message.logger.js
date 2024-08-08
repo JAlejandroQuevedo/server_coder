@@ -113,22 +113,22 @@ export const loggers = [
                     'Compra finalizada con exito'
 
                 ],
-                succesPostCarts: [
+                succesPostUsers: [
                     'Producto agregado con exito al carrito',
 
                 ],
-                succesPutCarts: [
+                succesPutUsers: [
                     'Producto actualizado con exito',
                     'Cantidad del producto actualizada con exito'
                 ],
-                successDeleteCarts: [
+                successDeleteUsers: [
                     'Producto eliminado correctamente',
                     'Productos eliminados correctamente'
                 ]
 
             },
             error: {
-                errorGetCarts: [
+                errorGetUsers: [
                     'Lo siento, no contamos con la cantidad de productos solicitada',
                     'Hubo un error al obtener los pruductos:',
                     'Error al obtener el historial del carrito:',
@@ -137,14 +137,14 @@ export const loggers = [
                     'Error al obtener los datos del carrito de la pagina solicitada',
                     'Error al agregar el producto:'
                 ],
-                errorPostCarts: [
+                errorPostUsers: [
                     'Error al agregar el producto:'
                 ],
-                errorPutCarts: [
+                errorPutUsers: [
                     'Error al actualizar el producto por ID',
                     'Error al actualizar la cantidad del producto: '
                 ],
-                errorDeleteCarts: [
+                errorDeleteUsers: [
                     'Lo siento no se pudo eliminar el producto',
                     'Lo siento no se pudieron eliminar los productos'
 

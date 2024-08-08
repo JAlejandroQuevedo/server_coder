@@ -46,15 +46,13 @@ jwtRouter.post('/register', verifyRequiredBodyAuth(['name', 'lastName', 'email',
 });
 jwtRouter.post('/jwtlogin', verifyRequiredBodyAuth(['email', 'password']), passport.authenticate('login', { failureRedirect: `/login?error=${encodeURI('Usuario o clave no válidos')}` }), async (req, res) => {
     try {
-        const token = createToken(req.user, '1h');
-        res.cookie(`${config.APP_NAME}_cookie`, token, { maxAge: 60 * 60 * 1000, httpOnly: true });
         const { email, password } = req.body;
         const foundUser = await ManagerLogin.getOne({ email: email });
-        if (foundUser && isValidPassword(password, foundUser.password)) {
-            res.redirect('/api/auth/jwtAuth');
-        } else {
-            res.status(401).send({ origin: config.PORT, payload: 'Datos de acceso no válidos' });
-        }
+        if (!foundUser && !isValidPassword(password, foundUser.password)) return res.status(401).send({ origin: config.PORT, payload: 'Datos de acceso no válidos' });
+        const token = createToken(req.user, '1h');
+        res.cookie(`${config.APP_NAME}_cookie`, token, { maxAge: 60 * 60 * 1000, httpOnly: true });
+        res.redirect('/api/auth/jwtAuth');
+
     } catch (err) {
         res.status(500).send({ origin: config.SERVER, payload: null, error: err.message });
         req.logger.error({ origin: config.SERVER, payload: null, error: err.message });

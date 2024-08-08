@@ -66,27 +66,32 @@ const initAuthStrategies = () => {
         callbackURL: '/api/auth/google/callback',
         passReqToCallback: true
     }, async (req, accessToken, refreshToken, profile, done) => {
-        const savedRol = "admin";
-        const foundUser = await modelUsersGoogle.find({ email: profile.emails[0].value });
-        if (foundUser.length === 0) {
-            const user = {
-                name: profile.name.givenName,
-                lastName: profile.name.familyName,
-                email: profile.emails[0].value,
+        try {
+            const savedRol = "admin";
+            const foundUser = await modelUsersGoogle.find({ email: profile.emails[0].value });
+            if (foundUser.length === 0) {
+                const user = {
+                    name: profile.name.givenName,
+                    lastName: profile.name.familyName,
+                    email: profile.emails[0].value,
+                }
+                const { name, lastName, email } = user;
+                const userDone = req.session.user = { name: name, lastName: lastName, email: email, role: savedRol };
+                modelUsersGoogle.create(user);
+                return done(null, userDone);
+            } else {
+                const user = {
+                    name: profile.name.givenName,
+                    lastName: profile.name.familyName,
+                    email: profile.emails[0].value,
+                }
+                const { name, lastName, email } = user;
+                const userDone = req.session.user = { name: name, lastName: lastName, email: email, role: savedRol };
+                return done(null, userDone);
             }
-            const { name, lastName, email } = user;
-            const userDone = req.session.user = { name: name, lastName: lastName, email: email, role: savedRol };
-            modelUsersGoogle.create(user);
-            return done(null, userDone);
-        } else {
-            const user = {
-                name: profile.name.givenName,
-                lastName: profile.name.familyName,
-                email: profile.emails[0].value,
-            }
-            const { name, lastName, email } = user;
-            const userDone = req.session.user = { name: name, lastName: lastName, email: email, role: savedRol };
-            return done(null, userDone);
+        }
+        catch (err) {
+            return done(err)
         }
     }));
     passport.use('jwtlogin', new jwtStrategy(

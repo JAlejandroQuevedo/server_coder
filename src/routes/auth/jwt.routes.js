@@ -2,6 +2,7 @@ import passport from "passport";
 import { Router } from "express";
 import { config } from "../../controllers/config/config.js";
 import { createToken, verifyToken } from "../../services/utils/jwtUtil.js";
+import { verifyTokenRecovery } from "../../services/utils/jwtUtilRecovery.js";
 import { verifyRequiredBodyAuth } from "../../services/utils/verifyRequiredBodyAuth.js";
 import { adminAuth } from "../../services/utils/adminAuth.js";
 import { ManagerLogin } from "../../controllers/dao/manager/managerLogin.mdb.js";
@@ -109,20 +110,17 @@ jwtRouter.post('/recovery', verifyRequiredBodyAuth(['email']), async (req, res) 
         if (!foundUser) {
             return res.status(401).send({ origin: config.PORT, payload: 'El usuario no está registrado' });
         }
-
-        // Convertir foundUser a un objeto simple si es necesario
         const userPayload = foundUser.toObject ? foundUser.toObject() : foundUser;
-        const token = createToken({ email: userPayload.email }, '1h'); // Sólo pasamos el email para el token
-
-        // Enviar email con el enlace de recuperación que incluye el token
+        const token = createToken({ email: userPayload.email }, '1h');
         const recoveryLink = `${config.BASE_URL}/api/auth/emailAuth?token=${token}`;
-        await sendMail(
-            'Recuperación de contraseña',
-            email,
-            'Por favor haz click en el siguiente enlace para recuperar tu contraseña',
-            `<h3>Haz click para recuperar la contraseña</h3>
-            <a href="${recoveryLink}">Haz click aquí para recuperar tu contraseña</a>`
-        );
+        console.log(recoveryLink)
+        // await sendMail(
+        //     'Recuperación de contraseña',
+        //     email,
+        //     'Por favor haz click en el siguiente enlace para recuperar tu contraseña',
+        //     `<h3>Haz click para recuperar la contraseña</h3>
+        //     <a href="${recoveryLink}">Haz click aquí para recuperar tu contraseña</a>`
+        // );
 
         req.logger.info('Email de recuperación enviado');
         res.status(200).send({ origin: config.PORT, payload: 'El email de recuperación ha sido enviado' });
@@ -133,20 +131,45 @@ jwtRouter.post('/recovery', verifyRequiredBodyAuth(['email']), async (req, res) 
     }
 });
 
-jwtRouter.get('/emailAuth', verifyToken, async (req, res) => {
+jwtRouter.get('/emailAuth', verifyTokenRecovery, async (req, res) => {
     try {
-        const email = req.user.email; // El email se extrajo del token
-        // Aquí podrías redirigir a una página de frontend para cambiar la contraseña
-        // Por ejemplo: /reset-password?email=${email}
-        res.status(200).send({ origin: config.PORT, payload: 'Token verificado, listo para cambiar la contraseña' });
+        req.session.email = req.user.email;
+        req.session.save(err => {
+            if (err) return res.status(500).send({ origin: config.PORT, payload: null, error: err.message });
+            res.redirect('/reset_password');
+        });
         req.logger.info('Token de recuperación verificado');
-
     } catch (err) {
         res.status(500).send({ origin: config.SERVER, payload: null, error: err.message });
         req.logger.error({ origin: config.SERVER, payload: null, error: err.message });
     }
 });
 
+jwtRouter.post('/resetPassword', verifyRequiredBodyAuth(['password', 'confirmPassword']), async (req, res) => {
+    try {
+        const { password, confirmPassword } = req.body;
+        if (password === confirmPassword) {
+            const email = req.session.email;
+            const foundUser = await ManagerLogin.getOne({ email: email });
+            isValidPassword(password, foundUser.password)
+            if (!isValidPassword) {
+                ManagerLogin.updatePassword(email, password, confirmPassword);
+                req.logger.info('Contraseña cambiada con exito');
+                res.status(200).send({ origin: config.PORT, payload: 'Contraseña cambiada con exito' });
+            } else {
+                req.logger.warn('La contraseña es igual a la anterior');
+                res.status(200).send({ origin: config.PORT, payload: 'La contraseña es igual a la anterior' });
+            }
+        } else {
+            req.logger.warn('Las contraseñas no son iguales');
+            res.status(200).send({ origin: config.PORT, payload: 'Las contraseñas no son iguales' });
+        }
+
+    } catch (err) {
+        res.status(500).send({ origin: config.SERVER, payload: null, error: err.message });
+        req.logger.error({ origin: config.SERVER, payload: null, error: err.message });
+    }
+});
 
 
 

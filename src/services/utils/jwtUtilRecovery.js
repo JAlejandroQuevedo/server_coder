@@ -1,22 +1,19 @@
 import { config } from '../../controllers/config/config.js';
 import jwt from 'jsonwebtoken';
 
-export const createToken = (payload, duration) => {
-    return jwt.sign(payload, config.SECRET, { expiresIn: duration });
-};
-
-export const verifyToken = (req, res, next) => {
+export const verifyTokenRecovery = (req, res, next) => {
     const headerToken = req.headers.authorization ? req.headers.authorization.split(' ')[1] : undefined;
     const cookieToken = req.cookies && req.cookies[`${config.APP_NAME}_cookie`] ? req.cookies[`${config.APP_NAME}_cookie`] : undefined;
     const queryToken = req.query.access_token ? req.query.access_token : undefined;
     const receivedToken = headerToken || cookieToken || queryToken;
     if (!receivedToken) {
+        // return res.redirect('/forgotYourPassword');
         return res.status(401).send({ origin: config.PORT, payload: 'Se requiere un token de autenticación' });
     }
     jwt.verify(receivedToken, config.SECRET, (err, decoded) => {
         if (err) {
             if (err.name === 'TokenExpiredError') {
-                return res.status(403).send({ origin: config.PORT, payload: 'Token expirado' });
+                return res.redirect('/forgotYourPassword');
             } else {
                 return res.status(403).send({ origin: config.PORT, payload: 'Token no válido' });
             }

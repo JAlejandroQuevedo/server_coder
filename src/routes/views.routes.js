@@ -32,6 +32,12 @@ routerHandle.get('/profile', (req, res) => {
 routerHandle.get('/registerCurrent', (req, res) => {
     res.render('registerCurrent', {});
 });
+routerHandle.get('/forgotYourPassword', (req, res) => {
+    res.render('forgotYourPassword', {});
+});
+routerHandle.get('/reset_password', (req, res) => {
+    res.render('reset_password', {});
+});
 
 routerHandle.get('/loginCurrent', (req, res) => {
     if (req.session.user) return res.redirect('/profile');

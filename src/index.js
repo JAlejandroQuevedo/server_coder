@@ -67,8 +67,8 @@ const httpServer = app.listen(config.PORT, async () => {
     //Custom routes
     app.use('/api/', new ProductRouter().getRouter());
     //View routes
-    // app.use('/', routerHandle);
-    // app.use('/static', express.static('public'))
+    app.use('/', routerHandle);
+    app.use('/static', express.static('public'))
 
 
     app.use('/static', express.static(`${config.DIRNAME}/public`));

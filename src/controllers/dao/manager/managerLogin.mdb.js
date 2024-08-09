@@ -1,4 +1,6 @@
 import { modelUsers } from "../models/users.model.js";
+import { logger } from "../../../services/log/logger.js";
+import { createHash, isValidPassword } from "../../../services/utils/bycript.js";
 
 class ManagerLogin {
 
@@ -43,7 +45,22 @@ class ManagerLogin {
         }
 
     }
+    static async updatePassword(email, password, verifyPassword) {
+        try {
+            const user = await modelUsers.find({ email: email });
+            const userPassword = user.map(user => user.password);
+            isValidPassword(password, userPassword[0])
+            if (!isValidPassword) {
+                const passwordHash = createHash(password);
+                await modelUsers.updateOne({ email: email }, { $set: { password: passwordHash } });
+                logger.info('Contraseña cambiada con exito');
+            } else {
+                logger.warn('Las contraseñas no son iguales o es igual a la anterior');
+            }
+        } catch (err) {
+            logger.error('Existe un error al intentar cambiar la contraseña')
+        }
+    }
+
 }
-
-
 export { ManagerLogin }

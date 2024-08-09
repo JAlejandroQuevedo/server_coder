@@ -11,6 +11,7 @@ import { MongoSingleton } from "./services/db/mongo.singleton.js";
 import { mockingProducts } from "./routes/mockingProducts.routes.js";
 import { loggerTest } from "./routes/logger_test.routes.js";
 import { logger } from "./services/log/logger.js";
+import { usersRoutes } from "./routes/auth/users.routes.js";
 // import { routereMAIL } from "./routes/orders.routes.js";
 import express from 'express'
 import handlebars from 'express-handlebars';
@@ -62,6 +63,7 @@ const httpServer = app.listen(config.PORT, async () => {
     app.use('/api', routerTicket);
     app.use(mockingProducts);
     app.use(loggerTest);
+    app.use('/api/users', usersRoutes);
     // app.use('/api', routereMAIL)
 
     //Custom routes

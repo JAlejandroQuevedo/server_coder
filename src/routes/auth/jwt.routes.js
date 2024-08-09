@@ -112,15 +112,14 @@ jwtRouter.post('/recovery', verifyRequiredBodyAuth(['email']), async (req, res) 
         }
         const userPayload = foundUser.toObject ? foundUser.toObject() : foundUser;
         const token = createToken({ email: userPayload.email }, '1h');
-        const recoveryLink = `${config.BASE_URL}/api/auth/emailAuth?token=${token}`;
-        console.log(recoveryLink)
-        // await sendMail(
-        //     'Recuperación de contraseña',
-        //     email,
-        //     'Por favor haz click en el siguiente enlace para recuperar tu contraseña',
-        //     `<h3>Haz click para recuperar la contraseña</h3>
-        //     <a href="${recoveryLink}">Haz click aquí para recuperar tu contraseña</a>`
-        // );
+        const recoveryLink = `${config.BASE_URL}/api/auth/emailAuth?access_token=${token}`;
+        await sendMail(
+            'Recuperación de contraseña',
+            email,
+            'Por favor haz click en el siguiente enlace para recuperar tu contraseña',
+            `<h3>Haz click para recuperar la contraseña</h3>
+            <a href="${recoveryLink}">Haz click aquí para recuperar tu contraseña</a>`
+        );
 
         req.logger.info('Email de recuperación enviado');
         res.status(200).send({ origin: config.PORT, payload: 'El email de recuperación ha sido enviado' });
@@ -170,7 +169,6 @@ jwtRouter.post('/resetPassword', verifyRequiredBodyAuth(['password', 'confirmPas
         req.logger.error({ origin: config.SERVER, payload: null, error: err.message });
     }
 });
-
 
 
 export { jwtRouter }

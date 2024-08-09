@@ -100,11 +100,12 @@ routerProducts.get('/products/pages/:page', async (req, res) => {
         res.status(500).json('Error interno del servidor')
     }
 })
-routerProducts.post('/products', uploader.single('thumbnail'), handlePolicies(["admin"]), verifyRequiredBodyProducts(['title', 'description', 'price', 'category', 'code', 'stock']), async (req, res) => {
+routerProducts.post('/products', uploader.single('thumbnail'), handlePolicies(["admin", "premium"]), verifyRequiredBodyProducts(['title', 'description', 'price', 'category', 'code', 'stock']), async (req, res) => {
     try {
         const { title, description, price, category, code, stock } = req.body;
         const thumbnail = req.file.path;
-        await CollectionManager.addProduct(title, description, price, category, thumbnail, code, stock);
+        const owner = req.session.user.role === 'admin' ? 'admin' : req.session.user._id;
+        await CollectionManager.addProduct(title, description, price, category, thumbnail, code, stock, owner);
         res.status(201).send('Producto agregado con exito');
         const products = await CollectionManager.getProducts();
         socketServer.emit('products', products);
@@ -132,15 +133,16 @@ routerProducts.put('/products/:id', handlePolicies(["admin"]), verifyMongoDBId('
         res.status(500).send('Error al interno en el servidor');
     }
 })
-routerProducts.delete('/products/:id', handlePolicies(["admin"]), verifyMongoDBId('id'), async (req, res) => {
+routerProducts.delete('/products/:id', handlePolicies(["admin", "premium"]), verifyMongoDBId('id'), async (req, res) => {
     try {
+        const _userId = req.session.user._id;
+        const _userRole = req.session.user.role;
         const filter = { _id: req.params.id };
-        await CollectionManager.deleteProductById(filter);
+        await CollectionManager.deleteProductById(filter, _userId, _userRole);
         res.status(200).send('Producto eliminado correctamente');
         const product = await CollectionManager.getProducts();
         socketServer.emit('products', product);
         req.logger.info('Producto eliminado correctamente');
-
     }
     catch (err) {
         req.logger.error('Lo siento no se pudo eliminar el producto:', err);

@@ -5,6 +5,7 @@ import { modelUsers } from "../models/users.model.js";
 import { sendMail } from "../../../services/mail/send.email.js";
 import { config } from "../../config/config.js";
 import { transport_nodemailer } from "../../../services/utils/nodemailer.js";
+import { logger } from "../../../services/log/logger.js";
 
 class ColectionManagerCart {
     static cart = [];
@@ -106,7 +107,7 @@ class ColectionManagerCart {
     static async addToCart(id, _user_id) {
         try {
             const productAdd = await modelProducts.findById(id);
-
+            if (productAdd.owner === _user_id) return logger.error('No puedes agregar a tu carrito productos que son tuyos')
             const userCartProducts = await modelCart.find({ _user_id: _user_id });
             const productInCart = userCartProducts.find(product => product._product_id.toString() === id);
             if (!productInCart) {

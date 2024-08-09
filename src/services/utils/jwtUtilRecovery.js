@@ -7,8 +7,8 @@ export const verifyTokenRecovery = (req, res, next) => {
     const queryToken = req.query.access_token ? req.query.access_token : undefined;
     const receivedToken = headerToken || cookieToken || queryToken;
     if (!receivedToken) {
-        // return res.redirect('/forgotYourPassword');
-        return res.status(401).send({ origin: config.PORT, payload: 'Se requiere un token de autenticación' });
+        return res.redirect('/forgotYourPassword');
+        // return res.status(401).send({ origin: config.PORT, payload: 'Se requiere un token de autenticación' });
     }
     jwt.verify(receivedToken, config.SECRET, (err, decoded) => {
         if (err) {

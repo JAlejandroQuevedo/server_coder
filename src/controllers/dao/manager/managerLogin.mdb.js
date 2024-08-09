@@ -61,6 +61,14 @@ class ManagerLogin {
             logger.error('Existe un error al intentar cambiar la contraseña')
         }
     }
+    static async updateUsers(_id, role) {
+        try {
+            const user = await modelUsers.updateOne({ _id: _id }, { $set: { role: role } });
+            return user;
+        } catch (err) {
+            logger.error('Existe un error al actualizar el role del usuario')
+        }
+    }
 
 }
 export { ManagerLogin }

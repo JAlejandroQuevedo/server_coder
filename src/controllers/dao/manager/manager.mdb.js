@@ -1,5 +1,6 @@
 // import modelProducts from "../factory/dao.factory.js";
 import { modelProducts } from "../models/products.model.js";
+import { logger } from "../../../services/log/logger.js";
 
 // const modelProducts = new ProductsService()
 
@@ -24,10 +25,10 @@ class CollectionManager {
             console.error('Error al leer el archivo', error)
         }
     }
-    static async addProduct(title, description, price, category, thumbnail, code, stock) {
+    static async addProduct(title, description, price, category, thumbnail, code, stock, owner) {
         try {
-            if (this.products.some(product => product.code === code)) return console.error(`El codigo de tu producto se encuentra en uso`)
-
+            const products = await modelProducts.find()
+            if (products.some(product => product.code === code)) return console.error(`El codigo de tu producto se encuentra en uso`)
             const product = {
                 title: title,
                 description: description,
@@ -36,10 +37,9 @@ class CollectionManager {
                 category: category,
                 thumbnail: thumbnail,
                 code: code,
-                stock: stock
+                stock: stock,
+                owner: `${owner}`
             };
-            if (this.products.some(product => product.code === code)) return
-            this.products.push(product);
             await modelProducts.create(product)
         }
         catch (error) {
@@ -61,18 +61,26 @@ class CollectionManager {
             const updateOne = update;
             const options = { new: true }
             const process = await modelProducts.findByIdAndUpdate(filter, updateOne, options)
-            return process
+            return process;
         }
         catch (error) {
             console.error('Existe un error al intentar actualizar el archivo', error)
         }
     }
 
-    static async deleteProductById(id) {
+    static async deleteProductById(id, _userId, _userRole) {
         try {
-            const filter = id;
-            const process = await modelProducts.findOneAndDelete(filter);
-            return process
+            if (_userRole === 'admin') {
+                const filter = id;
+                const process = await modelProducts.findOneAndDelete(filter);
+                return process;
+            } else if (_userRole === 'premium') {
+                const filter = { _id: id, owner: _userId };
+                const process = await modelProducts.findOneAndDelete(filter);
+                return process;
+            } else {
+                logger.warn("No cuentas con permisos para eliminar este producto")
+            }
         }
         catch (error) {
             console.error('Existe un error al intentar eliminar el elemento del archivo', error(error))

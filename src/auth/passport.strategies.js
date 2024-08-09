@@ -26,7 +26,7 @@ const initAuthStrategies = () => {
 
                 if (foundUser && isValidPassword(password, foundUser.password)) {
                     const { _id, name, lastName, email, gender } = foundUser;
-                    const savedRol = "admin";
+                    const savedRol = "premium";
                     const userDone = req.session.user = { _id: _id, name: name, lastName: lastName, email: email, gender: gender, role: savedRol };
                     return done(null, userDone);
                 } else {

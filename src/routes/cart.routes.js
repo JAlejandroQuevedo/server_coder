@@ -117,7 +117,7 @@ routerCart.get('/purchase', async (req, res) => {
         res.status(500).json('Error interno en el servidor')
     }
 })
-routerCart.post('/carts/:id', handlePolicies(['user']), verifyMongoDBId("id"), async (req, res) => {
+routerCart.post('/carts/:id', handlePolicies(['user', 'premium']), verifyMongoDBId("id"), async (req, res) => {
     try {
         const { id } = req.params
         const _user_id = req.session.user._id;

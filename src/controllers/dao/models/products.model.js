@@ -12,7 +12,8 @@ const schema = new mongoose.Schema({
     category: { type: String, required: true },
     thumbnail: { type: String, required: false },
     code: { type: String, required: true },
-    stock: { type: String, required: true }
+    stock: { type: String, required: true },
+    owner: { type: String, required: true }
 });
 
 schema.plugin(mongoosePaginate)

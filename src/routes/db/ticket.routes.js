@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { ColectionManagerTicket } from "../controllers/dao/manager/ticketManager.mdb.js";
-import { config } from "../controllers/config/config.js";
-import { socketServer } from "../index.js";
+import { ColectionManagerTicket } from "../../controllers/dao/manager/ticketManager.mdb.js";
+import { config } from "../../controllers/config/config.js";
+import { socketServer } from "../../index.js";
 
 
 const routerTicket = Router();

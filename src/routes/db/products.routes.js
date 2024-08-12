@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import { uploader } from '../services/uploader/uploaderCloudinary.js';
-import { socketServer } from '../index.js';
-import { modelProducts } from '../controllers/dao/models/products.model.js';
-import { CollectionManager } from '../controllers/dao/manager/manager.mdb.js';
-import { handlePolicies } from '../services/utils/policies.js';
-import { verifyRequiredBodyProducts } from '../services/utils/verifyRequiredBodyProducts.js';
-import { verifyMongoDBId } from '../services/utils/verify_mongo_id.js';
+import { uploader } from '../../services/uploader/uploaderCloudinary.js';
+import { socketServer } from '../../index.js';
+import { modelProducts } from '../../controllers/dao/models/products.model.js';
+import { CollectionManager } from '../../controllers/dao/manager/manager.mdb.js';
+import { handlePolicies } from '../../services/utils/policies.js';
+import { verifyRequiredBodyProducts } from '../../services/utils/verifyRequiredBodyProducts.js';
+import { verifyMongoDBId } from '../../services/utils/verify_mongo_id.js';
 // import CollectionManager from '../controllers/dao/factory/manager/products.manager.js'
 
 

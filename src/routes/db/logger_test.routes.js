@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { exec } from 'child_process';
-import { config } from "../controllers/config/config.js";
+import { config } from "../../controllers/config/config.js";
 import fs from 'fs'
-import { generateCode } from "../services/utils/code.js";
+import { generateCode } from "../../services/utils/code.js";
 // import { generateCode } from "../services/utils/code.js";
 
 const loggerTest = Router();

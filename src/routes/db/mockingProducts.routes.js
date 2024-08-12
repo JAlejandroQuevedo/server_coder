@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { genarateFakeProducts } from "../services/utils/fakerProducts.js";
+import { genarateFakeProducts } from "../../services/utils/fakerProducts.js";
 
 const mockingProducts = Router();
 const products = await genarateFakeProducts(50);

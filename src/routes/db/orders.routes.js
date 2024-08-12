@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { transport_nodemailer } from '../services/utils/nodemailer.js';
-import { config } from '../controllers/config/config.js';
+import { transport_nodemailer } from '../../services/utils/nodemailer.js';
+import { config } from '../../controllers/config/config.js';
 import compression from 'express-compression';
 const routereMAIL = Router();
 

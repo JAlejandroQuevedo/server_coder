@@ -1,15 +1,14 @@
 import { config } from "./controllers/config/config.js";
-import { routerProducts } from "./routes/products.routes.js";
-import { routerCart } from "./routes/cart.routes.js";
-import { routerHandle } from "./routes/views.routes.js";
-import { cookieRoute } from "./routes/cookies.routes.js";
+import { routerProducts } from "./routes/db/products.routes.js";
+import { routerCart } from "./routes/db/cart.routes.js";
+import { routerHandle } from "./routes/views/views.routes.js";
 import { chatSocket } from "./services/sockets/chat-socket.js";
 import { jwtRouter } from "./routes/auth/jwt.routes.js";
 import { ProductRouter } from "./routes/custom/router/routes/productRouter.routes.js";
-import { routerTicket } from "./routes/ticket.routes.js";
+import { routerTicket } from "./routes/db/ticket.routes.js";
 import { MongoSingleton } from "./services/db/mongo.singleton.js";
-import { mockingProducts } from "./routes/mockingProducts.routes.js";
-import { loggerTest } from "./routes/logger_test.routes.js";
+import { mockingProducts } from "./routes/db/mockingProducts.routes.js";
+import { loggerTest } from "./routes/db/logger_test.routes.js";
 import { logger } from "./services/log/logger.js";
 import { usersRoutes } from "./routes/auth/users.routes.js";
 // import { routereMAIL } from "./routes/orders.routes.js";
@@ -58,7 +57,7 @@ const httpServer = app.listen(config.PORT, async () => {
     app.use(addLogger)
     app.use('/api', routerProducts);
     app.use('/api', routerCart);
-    app.use('/api', cookieRoute);
+    // app.use('/api', cookieRoute);
     app.use('/api/auth', jwtRouter);
     app.use('/api', routerTicket);
     app.use(mockingProducts);

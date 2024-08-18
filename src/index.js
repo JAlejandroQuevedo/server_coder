@@ -11,71 +11,88 @@ import { mockingProducts } from "./routes/db/mockingProducts.routes.js";
 import { loggerTest } from "./routes/db/logger_test.routes.js";
 import { logger } from "./services/log/logger.js";
 import { usersRoutes } from "./routes/auth/users.routes.js";
+import { cpus } from "os";
 // import { routereMAIL } from "./routes/orders.routes.js";
 import express from 'express'
 import handlebars from 'express-handlebars';
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import MongoStore from "connect-mongo";
-import cors from "cors"
+import cors from "cors";
 import errorsHandler from "./services/error/errors.handler.js";
 import addLogger from "./services/log/logger.js";
+import cluster from 'cluster';
+let socketServer; // == > Socket usado de manera global en el servidor
 //Servidor
+if (cluster.isPrimary) {
+    for (let i = 0; i < cpus().length; i++) cluster.fork();
 
-const app = express();
-let socketServer;
-const httpServer = app.listen(config.PORT, async () => {
-    // const connObj = {
-    //     host: '',
-    //     port: 5050,
-    //     username: '',
-    //     pass: ''
-    // }
-    MongoSingleton.getInstance();
-    socketServer = chatSocket(httpServer);
-    app.set('socketServer', socketServer);
-    app.use(cors({ origin: '*' }))
-    app.use(express.json());
-    app.use(express.urlencoded({ extended: true }));
-    app.use(cookieParser(config.SECRET));
-    app.use(cors({ origin: '*' }))
-    app.use(session({
-        store: MongoStore.create({ mongoUrl: config.MONGODB_URI, ttl: 600 }),
-        secret: config.SECRET,
-        resave: true,
-        saveUninitialized: true
-    }));
-
-
-    //Configuracion de handlebars
-
-    app.engine('handlebars', handlebars.engine());
-    app.set('views', `${config.DIRNAME}/views`);
-    app.set('view engine', 'handlebars');
-
-    //General routes
-    app.use(addLogger)
-    app.use('/api', routerProducts);
-    app.use('/api', routerCart);
-    // app.use('/api', cookieRoute);
-    app.use('/api/auth', jwtRouter);
-    app.use('/api', routerTicket);
-    app.use(mockingProducts);
-    app.use(loggerTest);
-    app.use('/api/users', usersRoutes);
-    // app.use('/api', routereMAIL)
-
-    //Custom routes
-    app.use('/api/', new ProductRouter().getRouter());
-    //View routes
-    app.use('/', routerHandle);
-    app.use('/static', express.static('public'))
+    cluster.on('exit', (worker, code, signal) => {
+        logger.warn(`Se cayó la instancia ${worker.process.pid}`);
+        cluster.fork();
+    });
+} else {
+    try {
+        const app = express();
+        const httpServer = app.listen(config.PORT, async () => {
+            // const connObj = {
+            //     host: '',
+            //     port: 5050,
+            //     username: '',
+            //     pass: ''
+            // }
+            MongoSingleton.getInstance();
+            socketServer = chatSocket(httpServer);
+            app.set('socketServer', socketServer);
+            app.use(cors({ origin: '*' }))
+            app.use(express.json());
+            app.use(express.urlencoded({ extended: true }));
+            app.use(cookieParser(config.SECRET));
+            app.use(cors({ origin: '*' }))
+            app.use(session({
+                store: MongoStore.create({ mongoUrl: config.MONGODB_URI, ttl: 600 }),
+                secret: config.SECRET,
+                resave: true,
+                saveUninitialized: true
+            }));
 
 
-    app.use('/static', express.static(`${config.DIRNAME}/public`));
-    //Manejo de errorers
-    app.use(errorsHandler);
-    logger.info(`Servidor activo en puerto ${config.PORT} enlazada a bbdd en mode ${config.MODE}`);
-})
+            //Configuracion de handlebars
+
+            app.engine('handlebars', handlebars.engine());
+            app.set('views', `${config.DIRNAME}/views`);
+            app.set('view engine', 'handlebars');
+
+            //General routes
+            app.use(addLogger)
+            app.use('/api', routerProducts);
+            app.use('/api', routerCart);
+            // app.use('/api', cookieRoute);
+            app.use('/api/auth', jwtRouter);
+            app.use('/api', routerTicket);
+            app.use(mockingProducts);
+            app.use(loggerTest);
+            app.use('/api/users', usersRoutes);
+            // app.use('/api', routereMAIL)
+
+            //Custom routes
+            app.use('/api/', new ProductRouter().getRouter());
+            //View routes
+            app.use('/', routerHandle);
+            app.use('/static', express.static('public'))
+
+
+            app.use('/static', express.static(`${config.DIRNAME}/public`));
+            //Manejo de errorers
+            app.use(errorsHandler);
+            logger.info(`Servidor activo en puerto ${config.PORT} enlazada a bbdd en mode ${config.MODE} (PID ${process.pid})`);
+        })
+
+    }
+    catch (err) {
+        logger.error(`Error starting app (${err.message})`)
+    }
+}
+
 export { socketServer }
 

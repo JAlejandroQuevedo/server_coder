@@ -5,7 +5,7 @@ info:
   description: API para la gestión de carritos de compras y su historial.
 
 servers:
-  - url: http://localhost:3000/api
+  - url: http://localhost:8080/api
 
 paths:
   /carts/sort/{sort}:

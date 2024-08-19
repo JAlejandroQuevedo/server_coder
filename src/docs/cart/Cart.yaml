@@ -1,0 +1,257 @@
+openapi: 3.0.0
+info:
+  title: Cart API
+  version: 1.0.0
+  description: API para la gestión de carritos de compras y su historial.
+
+servers:
+  - url: http://localhost:3000/api
+
+paths:
+  /carts/sort/{sort}:
+    get:
+      summary: Ordenar productos del carrito.
+      parameters:
+        - name: sort
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Orden para los productos (1 para ascendente, -1 para descendente).
+      responses:
+        '200':
+          description: Productos ordenados exitosamente.
+        '500':
+          description: Error en el servidor.
+
+  /carts:
+    get:
+      summary: Obtener los productos del carrito del usuario.
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+          description: Límite de productos a devolver.
+      responses:
+        '200':
+          description: Productos del carrito obtenidos exitosamente.
+        '400':
+          description: No se cuenta con la cantidad de productos solicitada.
+        '500':
+          description: Error interno del servidor.
+
+  /historial/{_uid}:
+    get:
+      summary: Obtener el historial de compras del usuario.
+      parameters:
+        - name: _uid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID del usuario.
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+          description: Límite de productos a devolver.
+      responses:
+        '200':
+          description: Historial obtenido exitosamente.
+        '400':
+          description: Cantidad incorrecta de datos solicitada.
+        '500':
+          description: Error interno del servidor.
+
+  /carts/page/{page}:
+    get:
+      summary: Obtener productos del carrito por página.
+      parameters:
+        - name: page
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Número de página.
+      responses:
+        '200':
+          description: Productos obtenidos exitosamente.
+        '500':
+          description: Error interno del servidor.
+
+  /carts/{id}:
+    get:
+      summary: Obtener producto del carrito por ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID del producto.
+      responses:
+        '200':
+          description: Producto obtenido exitosamente.
+        '404':
+          description: Producto no encontrado.
+        '500':
+          description: Error interno del servidor.
+
+    post:
+      summary: Agregar producto al carrito.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID del producto.
+      responses:
+        '200':
+          description: Producto agregado exitosamente al carrito.
+        '500':
+          description: Error interno del servidor.
+
+    put:
+      summary: Actualizar producto en el carrito.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID del producto.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Producto actualizado exitosamente.
+        '500':
+          description: Error interno del servidor.
+
+    delete:
+      summary: Eliminar producto del carrito.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID del producto.
+      responses:
+        '200':
+          description: Producto eliminado correctamente.
+        '500':
+          description: Error interno del servidor.
+
+  /carts/{id}/products/{cid}:
+    put:
+      summary: Actualizar cantidad de un producto en el carrito.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID del producto en el carrito.
+        - name: cid
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Nueva cantidad del producto.
+      responses:
+        '200':
+          description: Cantidad del producto actualizada exitosamente.
+        '500':
+          description: Error interno del servidor.
+
+  /purchase:
+    get:
+      summary: Finalizar compra.
+      responses:
+        '200':
+          description: Compra finalizada exitosamente.
+        '500':
+          description: Error interno del servidor.
+
+  /carts/delete:
+    delete:
+      summary: Eliminar todos los productos del carrito.
+      responses:
+        '200':
+          description: Todos los productos eliminados correctamente.
+        '500':
+          description: Error interno del servidor.
+
+components:
+  schemas:
+    Cart:
+      type: object
+      properties:
+        _product_id:
+          type: string
+          description: ID del producto.
+        _user_id:
+          type: string
+          description: ID del usuario.
+        title:
+          type: string
+          description: Título del producto.
+        price:
+          type: string
+          description: Precio del producto.
+        thumbnail:
+          type: object
+          description: Miniatura del producto.
+        stock:
+          type: integer
+          description: Stock disponible del producto.
+        quantity:
+          type: integer
+          description: Cantidad del producto en el carrito.
+      required:
+        - _product_id
+        - _user_id
+        - title
+        - price
+        - quantity
+
+    CartHistorial:
+      type: object
+      properties:
+        _product_id:
+          type: string
+          description: ID del producto.
+        _user_id:
+          type: string
+          description: ID del usuario.
+        title:
+          type: string
+          description: Título del producto.
+        price:
+          type: string
+          description: Precio del producto.
+        thumbnail:
+          type: object
+          description: Miniatura del producto.
+        stock:
+          type: integer
+          description: Stock disponible del producto.
+        quantity:
+          type: integer
+          description: Cantidad del producto en el historial.
+      required:
+        - _product_id
+        - _user_id
+        - title
+        - price
+        - quantity

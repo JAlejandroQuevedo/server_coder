@@ -12,6 +12,7 @@ import { loggerTest } from "./routes/db/logger_test.routes.js";
 import { logger } from "./services/log/logger.js";
 import { usersRoutes } from "./routes/auth/users.routes.js";
 import { cpus } from "os";
+import { specs } from "./services/doc/swagger.js";
 // import { routereMAIL } from "./routes/orders.routes.js";
 import express from 'express'
 import handlebars from 'express-handlebars';
@@ -22,6 +23,7 @@ import cors from "cors";
 import errorsHandler from "./services/error/errors.handler.js";
 import addLogger from "./services/log/logger.js";
 import cluster from 'cluster';
+import swaggerUiExpress from 'swagger-ui-express';
 let socketServer; // == > Socket usado de manera global en el servidor
 //Servidor
 if (cluster.isPrimary) {
@@ -85,6 +87,8 @@ if (cluster.isPrimary) {
             app.use('/static', express.static(`${config.DIRNAME}/public`));
             //Manejo de errorers
             app.use(errorsHandler);
+            //Documentacion
+            app.use('/api/docs', swaggerUiExpress.serve, swaggerUiExpress.setup(specs));
             logger.info(`Servidor activo en puerto ${config.PORT} enlazada a bbdd en mode ${config.MODE} (PID ${process.pid})`);
         })
 

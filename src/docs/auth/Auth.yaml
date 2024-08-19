@@ -1,0 +1,184 @@
+openapi: 3.0.1
+info:
+  title: JWT Authentication API
+  description: API para manejar la autenticación, registro, recuperación de contraseñas y autenticación con Google.
+  version: 1.0.0
+servers:
+  - url: http://localhost:{port}/api/auth
+    description: Servidor local
+    variables:
+      port:
+        default: '3000'
+paths:
+  /users:
+    get:
+      summary: Obtener todos los usuarios
+      responses:
+        '200':
+          description: Lista de usuarios obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  origin:
+                    type: string
+                  users:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+        '500':
+          description: Error al obtener los usuarios
+  /register:
+    post:
+      summary: Registrar un nuevo usuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                lastName:
+                  type: string
+                email:
+                  type: string
+                gender:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Usuario creado exitosamente
+        '500':
+          description: Error al crear el usuario
+  /jwtlogin:
+    post:
+      summary: Iniciar sesión con JWT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Inicio de sesión exitoso
+        '401':
+          description: Datos de acceso no válidos
+        '500':
+          description: Error en el servidor
+  /jwtAuth:
+    get:
+      summary: Autenticación con JWT
+      responses:
+        '200':
+          description: Autenticación exitosa
+        '500':
+          description: Error en el servidor
+  /private:
+    get:
+      summary: Acceso privado para administradores
+      responses:
+        '200':
+          description: Bienvenido ADMIN
+        '500':
+          description: Error en el servidor
+  /logout:
+    get:
+      summary: Cerrar sesión
+      responses:
+        '200':
+          description: Sesión cerrada exitosamente
+        '500':
+          description: Error al cerrar sesión
+  /google:
+    get:
+      summary: Autenticación con Google
+      responses:
+        '302':
+          description: Redirige al perfil del usuario autenticado
+        '500':
+          description: Error en la autenticación
+  /google/callback:
+    get:
+      summary: Callback de autenticación con Google
+      responses:
+        '302':
+          description: Redirige al perfil del usuario autenticado
+        '500':
+          description: Error en la autenticación
+  /recovery:
+    post:
+      summary: Recuperación de contraseña
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+      responses:
+        '200':
+          description: Email de recuperación enviado
+        '500':
+          description: Error en la recuperación de contraseña
+  /emailAuth:
+    get:
+      summary: Autenticación con enlace de recuperación
+      responses:
+        '200':
+          description: Redirige a la página de restablecimiento de contraseña
+        '500':
+          description: Error en la autenticación
+  /resetPassword:
+    post:
+      summary: Restablecer contraseña
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                confirmPassword:
+                  type: string
+      responses:
+        '200':
+          description: Contraseña cambiada con éxito
+        '500':
+          description: Error en el servidor
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        name:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        gender:
+          type: string
+        password:
+          type: string
+        role:
+          type: string
+          enum:
+            - admin
+            - premium
+            - user
+          default: user

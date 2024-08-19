@@ -1,0 +1,52 @@
+openapi: 3.0.1
+info:
+  title: Tickets API
+  description: API para la gestión de tickets
+  version: 1.0.0
+
+paths:
+  /tickets:
+    get:
+      summary: Obtener todos los tickets
+      responses:
+        '200':
+          description: Lista de tickets obtenida correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  origin:
+                    type: string
+                    description: Puerto desde donde se originó la petición
+                    example: "3000"
+                  tickets:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Ticket'
+        '500':
+          description: Error interno del servidor
+
+    post:
+      summary: Crear un nuevo ticket
+      responses:
+        '200':
+          description: Ticket creado con éxito
+        '500':
+          description: Error interno del servidor
+
+components:
+  schemas:
+    Ticket:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID del ticket
+        user_id:
+          type: string
+          description: ID del usuario que creó el ticket
+        created_at:
+          type: string
+          format: date-time
+          description: Fecha y hora de creación del ticket

@@ -1,0 +1,203 @@
+openapi: 3.0.1
+info:
+  title: Productos API
+  description: API para la gestión de productos
+  version: 1.0.0
+
+paths:
+  /products:
+    get:
+      summary: Obtener todos los productos
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+          description: Límite de productos a obtener
+      responses:
+        '200':
+          description: Lista de productos obtenida correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 1
+                  payload:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Product'
+        '500':
+          description: Error interno del servidor
+
+    post:
+      summary: Agregar un nuevo producto
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: Título del producto
+                description:
+                  type: string
+                  description: Descripción del producto
+                price:
+                  type: string
+                  description: Precio del producto
+                category:
+                  type: string
+                  description: Categoría del producto
+                code:
+                  type: string
+                  description: Código del producto
+                stock:
+                  type: string
+                  description: Stock del producto
+                thumbnail:
+                  type: string
+                  format: binary
+                  description: Imagen del producto
+      responses:
+        '201':
+          description: Producto agregado con éxito
+        '500':
+          description: Error interno del servidor
+
+  /products/{id}:
+    get:
+      summary: Obtener un producto por ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID del producto
+      responses:
+        '200':
+          description: Producto obtenido correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  origin:
+                    type: string
+                    example: server1
+                  payload:
+                    $ref: '#/components/schemas/Product'
+        '404':
+          description: Producto no encontrado
+        '500':
+          description: Error interno del servidor
+
+    put:
+      summary: Actualizar un producto por ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID del producto
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                price:
+                  type: string
+                category:
+                  type: string
+                code:
+                  type: string
+                stock:
+                  type: string
+                thumbnail:
+                  type: string
+      responses:
+        '200':
+          description: Producto actualizado con éxito
+        '500':
+          description: Error interno del servidor
+
+    delete:
+      summary: Eliminar un producto por ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID del producto
+      responses:
+        '200':
+          description: Producto eliminado correctamente
+        '500':
+          description: Error interno del servidor
+
+  /products/sort/{sort}:
+    get:
+      summary: Obtener productos ordenados por un criterio
+      parameters:
+        - in: path
+          name: sort
+          required: true
+          schema:
+            type: integer
+          description: Criterio de ordenamiento
+      responses:
+        '200':
+          description: Productos obtenidos correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 1
+                  products:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Product'
+        '500':
+          description: Error interno del servidor
+
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        price:
+          type: string
+        status:
+          type: boolean
+        category:
+          type: string
+        thumbnail:
+          type: string
+        code:
+          type: string
+        stock:
+          type: string
+        owner:
+          type: string

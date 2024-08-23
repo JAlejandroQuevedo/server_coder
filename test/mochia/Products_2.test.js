@@ -1,8 +1,9 @@
 import Assert from 'assert';
 import mongoose from 'mongoose';
 import { CollectionManager } from '../../src/controllers/dao/manager/manager.mdb.js';
+import { config } from '../../src/controllers/config/config.js';
 
-const connection = await mongoose.connect('mongodb+srv://alejandroya24:6UU6PFUUMVOYtOKe@ecomerce.rdduzzd.mongodb.net/Ecommerce');
+const connection = await mongoose.connect(config.MONGODB_URI);
 let _id;
 const dao = CollectionManager
 const assert = Assert.strict;

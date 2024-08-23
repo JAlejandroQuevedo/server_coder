@@ -1,8 +1,9 @@
 import { expect } from 'chai';
 import mongoose from 'mongoose';
 import { CollectionManager } from '../../src/controllers/dao/manager/manager.mdb.js';
+import { config } from '../../src/controllers/config/config.js';
 
-const connection = await mongoose.connect('mongodb+srv://alejandroya24:6UU6PFUUMVOYtOKe@ecomerce.rdduzzd.mongodb.net/Ecommerce');
+const connection = await mongoose.connect(config.MONGODB_URI);
 const dao = CollectionManager
 let _id;
 const title = 'This is a title'

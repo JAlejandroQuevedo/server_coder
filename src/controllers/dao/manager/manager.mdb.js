@@ -40,7 +40,8 @@ class CollectionManager {
                 stock: stock,
                 owner: `${owner}`
             };
-            await modelProducts.create(product)
+            return await modelProducts.create(product);
+            // return product;
         }
         catch (error) {
             console.error('Error al intentar escribir el archivo', error)

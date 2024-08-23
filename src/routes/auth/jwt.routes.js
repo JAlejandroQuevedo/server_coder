@@ -40,7 +40,7 @@ jwtRouter.post('/register', verifyRequiredBodyAuth(['name', 'lastName', 'email',
     }
     catch (err) {
         req.logger.error('Existe un error al crear el usuario', err);
-        res.status(500).json('Error interno del servidor')
+        res.status(500).send('Error interno del servidor')
 
     }
 
@@ -53,7 +53,6 @@ jwtRouter.post('/jwtlogin', verifyRequiredBodyAuth(['email', 'password']), passp
         const token = createToken(req.user, '1h');
         res.cookie(`${config.APP_NAME}_cookie`, token, { maxAge: 60 * 60 * 1000, httpOnly: true });
         res.redirect('/api/auth/jwtAuth');
-
     } catch (err) {
         res.status(500).send({ origin: config.SERVER, payload: null, error: err.message });
         req.logger.error({ origin: config.SERVER, payload: null, error: err.message });

@@ -22,7 +22,7 @@ routerTicket.get('/tickets', async (req, res) => {
 
 routerTicket.post('/tickets', async (req, res) => {
     try {
-        const _user_id = req.session.user._id;
+        const _user_id = req.body._id || req.session.user._id;
         await ColectionManagerTicket.createTicket(_user_id);
         res.status(200).send('Ticket creado con exito');
         const tickets = await ColectionManagerTicket.getTickets();

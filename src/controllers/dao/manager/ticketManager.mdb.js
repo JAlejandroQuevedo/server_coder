@@ -1,7 +1,7 @@
 import { modelTicket } from "../models/ticket.model.js";
 import { modelUsers } from "../models/users.model.js";
 import { generateCode } from "../../../services/utils/code.js";
-
+import { modelCart } from "../models/cart.model.js";
 class ColectionManagerTicket {
     static tickets = [];
     static data;

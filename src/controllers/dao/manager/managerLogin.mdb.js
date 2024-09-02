@@ -63,6 +63,9 @@ class ManagerLogin {
     }
     static async updateUsers(_id, role) {
         try {
+            if (role === 'premium') {
+
+            }
             const user = await modelUsers.updateOne({ _id: _id }, { $set: { role: role } });
             return user;
         } catch (err) {

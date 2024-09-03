@@ -61,13 +61,36 @@ class ManagerLogin {
             logger.error('Existe un error al intentar cambiar la contraseña')
         }
     }
-    static async updateUsers(_id, role) {
+    static async updateUsers(_id, role, uploadedFiles) {
         try {
-            if (role === 'premium') {
 
+            if (role === 'premium') {
+                uploadedFiles.map(async files => {
+                    if (files.originalName !== 'Identificacion.pdf' && files.originalName !== 'Comprobante de domicilio.pdf' && files.originalName !== 'Comprobante de estado de cuenta.pdf') {
+                        logger.error(`El nombre del archivo ${files.originalName} es incorrecto, por favor corrigelo`);
+                        const user = await modelUsers.updateOne({ _id: _id }, { $set: { role: role } });
+                        return user;
+                    }
+                });
+                const updateResult = await modelUsers.updateOne(
+                    { _id: _id },
+                    {
+                        $set: { role: role }, // Actualiza el rol
+                        $push: {
+                            documents: {
+                                $each: uploadedFiles.map(({ originalName, cloudinaryPath }) => ({
+                                    name: originalName,
+                                    reference: cloudinaryPath
+                                }))
+                            }
+                        }
+                    }
+                );
+                return updateResult;
+            } else {
+                const user = await modelUsers.updateOne({ _id: _id }, { $set: { role: role } });
+                return user;
             }
-            const user = await modelUsers.updateOne({ _id: _id }, { $set: { role: role } });
-            return user;
         } catch (err) {
             logger.error('Existe un error al actualizar el role del usuario')
         }

@@ -22,16 +22,17 @@ usersRoutes.put('/premium/:uid', async (req, res) => {
         req.logger.error({ origin: config.SERVER, payload: null, error: err.message });
     }
 })
-usersRoutes.post('/premium/documents', uploader.single('thumbnail'), async (req, res) => {
+usersRoutes.post('/premium/documents/:uid', uploader.array('thumbnail', 10), async (req, res) => {
     try {
-        console.log('HI')
+        // console.log('HI')
         const _uid = req.params.uid;
-        const { path: filePath, originalname: originalName, filename, public_id } = req.file;
-        console.log(path)
-        console.log(originalName)
-        // const thumbnail = req.file.path;
-        const role = 'user';
-        ManagerLogin.updateUsers(_uid, role)
+        const uploadedFiles = req.files.map(file => ({
+            originalName: file.originalname, // Nombre original del archivo subido
+            cloudinaryPath: file.path, // Ruta del archivo en Cloudinary
+            publicId: file.filename // Nombre público del archivo en Cloudinary
+        }));
+        const role = 'premium';
+        ManagerLogin.updateUsers(_uid, role, uploadedFiles)
         res.status(200).send({
             origin: config.PORT,
             payload: `Role cambiado de manera exitosa a ${role}`

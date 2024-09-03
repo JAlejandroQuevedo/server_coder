@@ -63,7 +63,6 @@ class ManagerLogin {
     }
     static async updateUsers(_id, role, uploadedFiles) {
         try {
-
             if (role === 'premium') {
                 uploadedFiles.map(async files => {
                     if (files.originalName !== 'Identificacion.pdf' && files.originalName !== 'Comprobante de domicilio.pdf' && files.originalName !== 'Comprobante de estado de cuenta.pdf') {

@@ -22,7 +22,7 @@ usersRoutes.put('/premium/:uid', async (req, res) => {
         req.logger.error({ origin: config.SERVER, payload: null, error: err.message });
     }
 })
-usersRoutes.post('/premium/documents/:uid', uploader.array('thumbnail', 10), async (req, res) => {
+usersRoutes.post('/premium/documents/:uid', uploader.array('thumbnail', 3), async (req, res) => {
     try {
         // console.log('HI')
         const _uid = req.params.uid;

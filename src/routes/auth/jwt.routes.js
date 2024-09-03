@@ -10,7 +10,6 @@ import { ManagerLoginGoogle } from "../../controllers/dao/manager/managerGogle.m
 import { createHash, isValidPassword } from "../../services/utils/bycript.js";
 import { initAuthStrategies } from "../../auth/passport.strategies.js";
 import { sendMail } from "../../services/mail/send.email.js";
-import { modelUsersGoogle } from "../../controllers/dao/models/user.google.js";
 const jwtRouter = Router()
 initAuthStrategies()
 jwtRouter.get('/users', async (req, res) => {

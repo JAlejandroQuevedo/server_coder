@@ -2,10 +2,12 @@ import passport from 'passport';
 import local from 'passport-local';
 import jwt from 'passport-jwt';
 import { ManagerLogin } from '../controllers/dao/manager/managerLogin.mdb.js';
+import { ManagerLoginGoogle } from '../controllers/dao/manager/managerGogle.mdb.js';
 import { modelUsersGoogle } from '../controllers/dao/models/user.google.js';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { isValidPassword, createHash } from '../services/utils/bycript.js';
 import { config } from '../controllers/config/config.js';
+import { logger } from '../services/log/logger.js';
 
 const localStrategy = local.Strategy;
 const jwtStrategy = jwt.Strategy;
@@ -68,8 +70,9 @@ const initAuthStrategies = () => {
     }, async (req, accessToken, refreshToken, profile, done) => {
         try {
             const savedRol = "admin";
-            const foundUser = await modelUsersGoogle.find({ email: profile.emails[0].value });
-            if (foundUser.length === 0) {
+            const foundUserGoogle = await modelUsersGoogle.find({ email: profile.emails[0].value });
+            const foundUser = await ManagerLogin.getOne({ email: profile.emails[0].value });
+            if (foundUserGoogle.length === 0 && !foundUser) {
                 const user = {
                     name: profile.name.givenName,
                     lastName: profile.name.familyName,
@@ -77,17 +80,32 @@ const initAuthStrategies = () => {
                 }
                 const { name, lastName, email } = user;
                 const userDone = req.session.user = { name: name, lastName: lastName, email: email, role: savedRol };
-                modelUsersGoogle.create(user);
+                ManagerLoginGoogle.addUser(name, lastName, email);
+                return done(null, userDone);
+            } else if (foundUserGoogle.length !== 0) {
+                const user = {
+                    name: profile.name.givenName,
+                    lastName: profile.name.familyName,
+                    email: profile.emails[0].value,
+                }
+                const { name, lastName, email } = user;
+                const userDone = req.session.user = { name: name, lastName: lastName, email: email, role: savedRol };
                 return done(null, userDone);
             } else {
-                const user = {
-                    name: profile.name.givenName,
-                    lastName: profile.name.familyName,
-                    email: profile.emails[0].value,
+                // Limpiar los datos de sesión del usuario para asegurar que no queden datos en caché.
+                if (req.session) {
+                    req.session.destroy((err) => {
+                        if (err) {
+                            logger.error('Error al intentar destruir la sesión: ', err);
+                            return done(err);
+                        }
+                        logger.warn('El usuario ya está registrado. Los datos de la sesión han sido restablecidos.');
+                        return done(null, false, { message: 'Usuario ya registrado, por favor inicia sesión.' });
+                    });
+                } else {
+                    logger.warn('El usuario ya está registrado, pero no se encontró ninguna sesión activa.');
+                    return done(null, false, { message: 'Usuario ya registrado, por favor inicia sesión.' });
                 }
-                const { name, lastName, email } = user;
-                const userDone = req.session.user = { name: name, lastName: lastName, email: email, role: savedRol };
-                return done(null, userDone);
             }
         }
         catch (err) {

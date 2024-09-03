@@ -23,7 +23,7 @@ const schema = new mongoose.Schema({
         }
     ],
     role: { type: String, enum: ['admin', 'premium', 'user'], default: 'user' },
-    last_conection: { type: String, required: true }
+    last_conection: { type: String, required: false }
 });
 schema.plugin(mongoosePaginate)
 const modelUsers = mongoose.model(collection, schema);

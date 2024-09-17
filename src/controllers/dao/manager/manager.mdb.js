@@ -1,6 +1,8 @@
 // import modelProducts from "../factory/dao.factory.js";
 import { modelProducts } from "../models/products.model.js";
 import { logger } from "../../../services/log/logger.js";
+import { modelUsers } from "../models/users.model.js";
+import { sendMail } from "../../../services/mail/send.email.js";
 
 // const modelProducts = new ProductsService()
 
@@ -77,6 +79,15 @@ class CollectionManager {
                 const process = await modelProducts.findOneAndDelete(filter);
                 return process;
             } else if (_userRole === 'premium') {
+                const user = await modelUsers.find({ _id: _userId });
+                await sendMail(
+                    'Alerta',
+                    user[0].email,
+                    'Producto eliminado de manera correcta',
+                    `
+                        <h3>Tu producto fue eliminado correctamente</h3>
+                        `
+                );
                 const filter = { _id: id, owner: _userId };
                 const process = await modelProducts.findOneAndDelete(filter);
                 return process;

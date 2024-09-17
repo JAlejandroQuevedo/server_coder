@@ -75,7 +75,7 @@ const initAuthStrategies = () => {
         passReqToCallback: true
     }, async (req, accessToken, refreshToken, profile, done) => {
         try {
-            const savedRol = "admin";
+            const savedRol = "premium";
             const foundUserGoogle = await modelUsersGoogle.find({ email: profile.emails[0].value });
             const foundUser = await ManagerLogin.getOne({ email: profile.emails[0].value });
             if (foundUserGoogle.length === 0 && !foundUser) {

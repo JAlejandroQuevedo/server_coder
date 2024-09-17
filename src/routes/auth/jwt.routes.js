@@ -12,19 +12,7 @@ import { initAuthStrategies } from "../../auth/passport.strategies.js";
 import { sendMail } from "../../services/mail/send.email.js";
 const jwtRouter = Router()
 initAuthStrategies()
-jwtRouter.get('/users', async (req, res) => {
-    try {
-        const users = await ManagerLogin.getUsers();
-        res.status(200).send({
-            origin: config.PORT,
-            users: users
-        })
-        req.logger.info('Usuarios obtenidos de manera exitosa');
-    }
-    catch (err) {
-        req.logger.error('Existe un error al obtener los usuarios', err);
-    }
-})
+
 jwtRouter.post('/register', verifyRequiredBodyAuth(['name', 'lastName', 'email', 'password']), async (req, res) => {
     try {
         const { name, lastName, email, gender, password } = req.body;
@@ -38,12 +26,13 @@ jwtRouter.post('/register', verifyRequiredBodyAuth(['name', 'lastName', 'email',
                 payload: 'Usuario creado de manera exitosa'
             })
             req.logger.info('Usuario creado de manera exitosa');
+        } else {
+            res.status(500).send({
+                origin: config.PORT,
+                payload: 'El email ya está registrado'
+            })
+            req.logger.warn('El email ya está registrado');
         }
-        res.status(500).send({
-            origin: config.PORT,
-            payload: 'El email ya está registrado'
-        })
-        req.logger.warn('El email ya está registrado');
     }
     catch (err) {
         req.logger.error('Existe un error al crear el usuario', err);
@@ -111,7 +100,6 @@ jwtRouter.get('/google/callback',
             res.redirect('/profile');
         });
     }
-
 );
 jwtRouter.post('/recovery', verifyRequiredBodyAuth(['email']), async (req, res) => {
     try {

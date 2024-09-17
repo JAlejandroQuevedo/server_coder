@@ -1,5 +1,6 @@
 import { transport_nodemailer } from "../utils/nodemailer.js";
 import { config } from "../../controllers/config/config.js";
+import { logger } from "../log/logger.js";
 
 export const sendMail = async (from_message, to_email, subject_message, html_body) => {
     try {
@@ -13,11 +14,11 @@ export const sendMail = async (from_message, to_email, subject_message, html_bod
             subject: subject_message,
             html: html_body
         })
-        console.log(`Email enviado de manera exitosa a: ${to_email}`);
+        logger.info(`Email enviado de manera exitosa a: ${to_email}`);
         return confirmation
     }
     catch (err) {
-        console.error('Existe un error al enviar el email:', {
+        logger.error('Existe un error al enviar el email:', {
             message: err.message,
             stack: err.stack,
             to: to_email,

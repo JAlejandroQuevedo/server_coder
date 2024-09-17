@@ -2,6 +2,7 @@
 import { modelUsersGoogle } from "../models/user.google.js";
 import { logger } from "../../../services/log/logger.js";
 import { createHash, isValidPassword } from "../../../services/utils/bycript.js";
+import { dateTime } from "../../../services/utils/dateTime.js";
 const modelUsers = modelUsersGoogle
 class ManagerLoginGoogle {
 
@@ -14,11 +15,19 @@ class ManagerLoginGoogle {
     }
     static async getUsers() {
         try {
-            const users = await modelUsers.find()
-            return users;
+            const users = await modelUsers.find();
+            const user_filter = users.map(user => {
+                return {
+                    name: user.name,
+                    lastName: user.lastName,
+                    email: user.email,
+                    role: user.role
+                }
+            })
+            return user_filter;
         }
         catch (error) {
-            console.error('Error al leer el archivo', error)
+            logger.error('Error al leer el archivo', error)
         }
     }
     static async getOne(fiter) {
@@ -27,20 +36,24 @@ class ManagerLoginGoogle {
             return user;
         }
         catch (err) {
-            console.error('Error al obtener el usuario', err)
+            logger.error('Error al obtener el usuario', err)
         }
     }
     static async addUser(name, lastName, email) {
+        const last_conection = dateTime();
+        const conection = new Date()
         try {
             const users = {
                 name,
                 lastName,
-                email
+                email,
+                last_conection,
+                conection
             };
             await modelUsers.create(users)
         }
         catch (error) {
-            console.error('Error al intentar escribir el archivo', error)
+            logger.error('Error al intentar escribir el archivo', error)
         }
 
     }

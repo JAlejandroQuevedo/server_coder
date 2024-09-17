@@ -2,10 +2,25 @@ import { Router } from "express";
 import { config } from "../../controllers/config/config.js";
 import { initAuthStrategies } from "../../auth/passport.strategies.js";
 import { ManagerLogin } from "../../controllers/dao/manager/managerLogin.mdb.js";
+import { ManagerLoginGoogle } from "../../controllers/dao/manager/managerGogle.mdb.js";
 import { uploader } from "../../services/uploader/uploaderCloudinaryDocuments.js";
 initAuthStrategies()
 const usersRoutes = Router();
-
+usersRoutes.get('/', async (req, res) => {
+    try {
+        const users = await ManagerLogin.getUsers();
+        const usersGoogle = await ManagerLoginGoogle.getUsers()
+        res.status(200).send({
+            origin: config.PORT,
+            users: users,
+            usersGoogle: usersGoogle
+        })
+        req.logger.info('Usuarios obtenidos de manera exitosa');
+    }
+    catch (err) {
+        req.logger.error('Existe un error al obtener los usuarios', err);
+    }
+})
 
 usersRoutes.put('/premium/:uid', async (req, res) => {
     try {
@@ -37,9 +52,23 @@ usersRoutes.post('/premium/documents/:uid', uploader.array('thumbnail', 3), asyn
             origin: config.PORT,
             payload: `Role cambiado de manera exitosa a ${role}`
         })
-        req.logger.info('Usuario creado de manera exitosa');
+        req.logger.info('Role cambiado de manera exitosa a ${role}');
     } catch (err) {
         res.status(500).send({ origin: config.SERVER, payload: null, error: err.message });
+        req.logger.error({ origin: config.SERVER, payload: null, error: err.message });
+    }
+})
+usersRoutes.delete('/', async (req, res) => {
+    try {
+        ManagerLogin.deleteUsers()
+        res.status(200).send({
+            origin: config.PORT,
+            payload: 'Tiempo limite solicitado'
+        })
+
+
+    }
+    catch (err) {
         req.logger.error({ origin: config.SERVER, payload: null, error: err.message });
     }
 })

@@ -2,6 +2,7 @@ import { modelTicket } from "../models/ticket.model.js";
 import { modelUsers } from "../models/users.model.js";
 import { generateCode } from "../../../services/utils/code.js";
 import { modelCart } from "../models/cart.model.js";
+import { logger } from "../../../services/log/logger.js";
 class ColectionManagerTicket {
     static tickets = [];
     static data;
@@ -18,7 +19,7 @@ class ColectionManagerTicket {
             }
         }
         catch (error) {
-            console.error('Error al leer el archivo', error)
+            logger.error('Error al leer el archivo', error)
         }
     }
     static async createTicket(_user_id) {
@@ -54,7 +55,7 @@ class ColectionManagerTicket {
                 await modelTicket.create(ticket);
             }
         } catch (err) {
-            console.error('Existe un error al intentar agregar tu producto al carrito', err)
+            logger.error('Existe un error al intentar agregar tu producto al carrito', err)
         }
     }
 

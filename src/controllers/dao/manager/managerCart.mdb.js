@@ -23,7 +23,7 @@ class ColectionManagerCart {
             }
         }
         catch (error) {
-            console.error('Error al leer el archivo', error)
+            logger.error('Error al leer el archivo', error);
         }
     }
     static async getProducts(_user_id, limit) {
@@ -38,7 +38,7 @@ class ColectionManagerCart {
             }
         }
         catch (error) {
-            console.error('Error al leer el archivo', error)
+            logger.error('Error al leer el archivo', error);
         }
     }
     static async getHistorial(_uid, limit) {
@@ -53,7 +53,7 @@ class ColectionManagerCart {
             }
         }
         catch (error) {
-            console.error('Error al leer el archivo', error)
+            logger.error('Error al leer el archivo', error);
         }
     }
     static async endPurchase(_user_id) {
@@ -82,32 +82,31 @@ class ColectionManagerCart {
                     })
                 }));
             } else {
-                console.error("Usuario no encontrado")
+                logger.warn("Usuario no encontrado");
             }
         }
         catch (err) {
-            console.error('Error al intentar terminar con la compra', err.message)
+            logger.error('Error al intentar terminar con la compra', err.message);
         }
     }
     static async getProductCartById(id) {
         const products = await modelCart.findById(id);
         if (!products) {
-            console.error('Producto no encontrado')
+            logger.warn('Producto no encontrado');
         }
         return products;
     }
     static async loadCartFromDataBase() {
         try {
-            this.cart = await modelCart.find()
-            console.log(this.cart)
+            return this.cart = await modelCart.find()
         } catch (error) {
-            console.error('Error al cargar el producto', error)
+            logger.error('Error al cargar el producto', error);
         }
     }
     static async addToCart(id, _user_id) {
         try {
             const productAdd = await modelProducts.findById(id);
-            if (productAdd.owner === _user_id) return logger.error('No puedes agregar a tu carrito productos que son tuyos')
+            if (productAdd.owner === _user_id) return logger.warn('No puedes agregar a tu carrito productos que son tuyos')
             const userCartProducts = await modelCart.find({ _user_id: _user_id });
             const productInCart = userCartProducts.find(product => product._product_id.toString() === id);
             if (!productInCart) {
@@ -131,7 +130,7 @@ class ColectionManagerCart {
                 await cartHistorial.updateOne({ _user_id: _user_id, _product_id: id }, { $set: { quantity: newCuantity } });
             }
         } catch (err) {
-            console.error('Existe un error al intentar agregar tu producto al carrito', err)
+            logger.error('Existe un error al intentar agregar tu producto al carrito', err);
         }
     }
     static async updateProduct(id, update) {
@@ -144,7 +143,7 @@ class ColectionManagerCart {
             return process
         }
         catch (error) {
-            console.error('Existe un error al intentar actualizar el archivo', error)
+            logger.error('Existe un error al intentar actualizar el archivo', error);
         }
     }
     static async updateProductQuantity(id, quantity) {
@@ -158,8 +157,9 @@ class ColectionManagerCart {
             return process
         }
         catch (error) {
-            console.error('Existe un error al intentar actualizar la cantidad del archivo', error)
+            logger.error('Existe un error al intentar actualizar la cantidad del archivo', error);
         }
+
     }
 
     static async deleteProductById(id, cid) {
@@ -171,7 +171,7 @@ class ColectionManagerCart {
             return process, processProducts
         }
         catch (error) {
-            console.error('Existe un error al intentar eliminar el elemento del archivo', error)
+            logger.error('Existe un error al intentar eliminar el elemento del archivo', error);
         }
     }
     static async deleteAll() {
@@ -180,8 +180,8 @@ class ColectionManagerCart {
             return process
         }
         catch (error) {
-            console.error('Existe un error al intentar eliminar todos los eleentos del carrito ', error)
-            throw error
+            logger.error('Existe un error al intentar eliminar todos los elementos del carrito', error);
+            throw error;
         }
     }
 
@@ -200,7 +200,7 @@ class ColectionManagerCart {
             }
         }
         catch (err) {
-            console.error('Error en el servidor', err)
+            logger.error('Error en el servidor', err);
         }
     }
 

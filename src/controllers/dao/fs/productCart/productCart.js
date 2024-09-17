@@ -1,10 +1,11 @@
 import fs from 'fs';
 import { data } from '../../../../public/data/dataProductManager.js';
+import { logger } from '../../../../services/log/logger.js';
 
 
 class ProductCart {
     static cart = [];
-    static pathCart = './productCart.json';
+    static pathCart = '../../../../public/data/productCart.json';
     static dataCart = data;
 
     static async getProducts(limit) {
@@ -26,17 +27,23 @@ class ProductCart {
             }
         }
         catch (error) {
-            console.error('Error al leer el archivo', error)
+            logger.error('Error al leer el archivo', error);
         }
     }
     static async getProductCartById(id) {
-        const recovered = await fs.promises.readFile(this.pathCart, 'utf8');
-        const dataParse = JSON.parse(recovered)
-        const product = dataParse.find(product => product.id === id);
-        if (!product) {
-            console.error('Producto no encontrado')
+        try {
+
+            const recovered = await fs.promises.readFile(this.pathCart, 'utf8');
+            const dataParse = JSON.parse(recovered)
+            const product = dataParse.find(product => product.id === id);
+            if (!product) {
+                logger.warn('Producto no encontrado');
+            }
+            return product;
         }
-        return product;
+        catch (error) {
+            logger.error('Error al intentar obtener el producto del carrito por ID', error);
+        }
     }
     static async addToCart(id) {
         try {
@@ -62,10 +69,10 @@ class ProductCart {
                 const data = JSON.stringify(this.cart);
                 await fs.promises.writeFile(this.pathCart, data);
             } else {
-                console.log('El producto que deseas agregar no existe')
+                logger.info('El producto que deseas agregar no existe');
             }
         } catch (err) {
-            console.error('Existe un error al intentar agregar tu producto al carrito', err)
+            logger.error('Existe un error al intentar agregar tu producto al carrito', err)
         }
     }
 }

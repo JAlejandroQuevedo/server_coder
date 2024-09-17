@@ -1,4 +1,5 @@
 import fs from 'fs';
+import { logger } from '../../../../services/log/logger.js';
 
 class ProctManager {
     static counter = 0;
@@ -6,7 +7,7 @@ class ProctManager {
     static products = [];
 
 
-    static path = './products.json'
+    static path = '../../../../public/data/products.json'
 
     static async getProducts(limit) {
         try {
@@ -27,13 +28,14 @@ class ProctManager {
             }
         }
         catch (error) {
-            console.error('Error al leer el archivo', error)
+            logger.error('Error al leer el archivo', error);
         }
     }
     static async addProduct(title, description, price, category, thumbnail, code, stock) {
         try {
             if (this.products.some(product => product.code === code)) {
-                console.error(`El codigo de tu producto se encuentra en uso`)
+                logger.warn('El codigo de tu producto se encuentra en uso');
+                return;
             }
             ProctManager.counter = this.products.length + 1;
             const id = ProctManager.counter;
@@ -56,18 +58,24 @@ class ProctManager {
             }
         }
         catch (error) {
-            console.error('Error al intentar escribir el archivo', error)
+            logger.error('Error al intentar escribir el archivo', error);
         }
 
     }
     static async getProductById(id) {
-        const recovered = await fs.promises.readFile(this.path, 'utf8');
-        const dataParse = JSON.parse(recovered)
-        const product = dataParse.find(product => product.id === id);
-        if (!product) {
-            console.error('Producto no encontrado')
+        try {
+            const recovered = await fs.promises.readFile(this.path, 'utf8');
+            const dataParse = JSON.parse(recovered)
+            const product = dataParse.find(product => product.id === id);
+            if (!product) {
+                logger.warn('Producto no encontrado');
+                return null;
+            }
+            return product;
         }
-        return product;
+        catch (error) {
+            logger.error('Error al intentar leer el producto por ID', error);
+        }
     }
 
     static async updateProduct(id, update) {
@@ -79,19 +87,19 @@ class ProctManager {
                     this.products.forEach(products => {
                         update.id = products.id;
                     })
-                    console.error('No puedes modificar el id, por favor intenta de nuevo')
+                    logger.warn('No puedes modificar el id, por favor intenta de nuevo');
                     return;
                 }
                 this.products[index] = { ...this.products[index], ...update }
-                console.log('Archivo modificado con exito')
+                logger.info('Archivo modificado con exito');
             } else {
-                console.error('El producto no existe')
+                logger.warn('El producto no existe');
             }
             const data = JSON.stringify(this.products)
             await fs.promises.writeFile(this.path, data)
         }
         catch (error) {
-            console.error('Existe un error al intentar actualizar el archivo', error)
+            logger.error('Existe un error al intentar actualizar el archivo', error);
         }
     }
 
@@ -107,13 +115,14 @@ class ProctManager {
                     product.id = counter;
                 })
                 let data = JSON.stringify(this.products);
-                await fs.promises.writeFile(this.path, data)
+                await fs.promises.writeFile(this.path, data);
+                logger.info('Producto eliminado correctamente');
             } else {
-                console.error('El producto que deseas eliminar no existe')
+                logger.warn('El producto que deseas eliminar no existe');
             }
         }
         catch (error) {
-            console.error('Existe un error al intentar eliminar el elemento del archivo', error(error))
+            logger.error('Existe un error al intentar eliminar el elemento del archivo', error);
         }
     }
 

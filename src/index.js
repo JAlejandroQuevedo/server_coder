@@ -6,13 +6,15 @@ import { chatSocket } from "./services/sockets/chat-socket.js";
 import { jwtRouter } from "./routes/auth/jwt.routes.js";
 import { ProductRouter } from "./routes/custom/router/routes/productRouter.routes.js";
 import { routerTicket } from "./routes/db/ticket.routes.js";
-import { MongoSingleton } from "./services/db/mongo.singleton.js";
+// import { MongoSingleton } from "./services/db/mongo.singleton.js";
+import { factory } from "./controllers/dao/factory/dao.factory.js";
 import { mockingProducts } from "./routes/db/mockingProducts.routes.js";
 import { loggerTest } from "./routes/db/logger_test.routes.js";
 import { logger } from "./services/log/logger.js";
 import { usersRoutes } from "./routes/auth/users.routes.js";
 import { cpus } from "os";
 import { specs } from "./services/doc/swagger.js";
+import { ManagerLogin } from "./controllers/dao/manager/managerLogin.mdb.js";
 // import { routereMAIL } from "./routes/orders.routes.js";
 import express from 'express'
 import handlebars from 'express-handlebars';
@@ -24,6 +26,7 @@ import errorsHandler from "./services/error/errors.handler.js";
 import addLogger from "./services/log/logger.js";
 import cluster from 'cluster';
 import swaggerUiExpress from 'swagger-ui-express';
+import cron from 'node-cron';
 let socketServer; // == > Socket usado de manera global en el servidor
 //Servidor
 if (cluster.isPrimary) {
@@ -43,7 +46,8 @@ if (cluster.isPrimary) {
             //     username: '',
             //     pass: ''
             // }
-            MongoSingleton.getInstance();
+            factory()
+            // MongoSingleton.getInstance();
             socketServer = chatSocket(httpServer);
             app.set('socketServer', socketServer);
             app.use(cors({ origin: '*' }))
@@ -57,7 +61,6 @@ if (cluster.isPrimary) {
                 resave: true,
                 saveUninitialized: true
             }));
-
 
             //Configuracion de handlebars
 
@@ -89,6 +92,16 @@ if (cluster.isPrimary) {
             app.use(errorsHandler);
             //Documentacion
             app.use('/api/docs', swaggerUiExpress.serve, swaggerUiExpress.setup(specs));
+            //Configuracion de cron con tiempo de 5 horas
+            cron.schedule('0 */5 * * *', async () => {
+                try {
+                    ManagerLogin.deleteUsers();
+                    logger.info('Cuenta regresiva para comprobación de usuarios activos reiniciada');
+                }
+                catch (err) {
+                    logger.error('Error al eliminar usuarios:', err.message)
+                }
+            })
             logger.info(`Servidor activo en puerto ${config.PORT} enlazada a bbdd en mode ${config.MODE} (PID ${process.pid})`);
         })
 
@@ -97,6 +110,5 @@ if (cluster.isPrimary) {
         logger.error(`Error starting app (${err.message})`)
     }
 }
-
 export { socketServer }
 

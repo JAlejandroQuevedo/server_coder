@@ -1,5 +1,6 @@
 export const errorsDictionary = {
     UNHANDLED_ERROR: { code: 0, status: 500, message: 'Error no identificado' },
+    INVALID_KEY_ROLE: { code: 3, status: 400, message: 'El KEY de acceso proporcionado es incorrecto, por favor intenta de nuevo' },
     ROUTING_ERROR: { code: 1, status: 404, message: 'No se encuentra el endpoint solicitado' },
     FEW_PARAMETERS: { code: 2, status: 400, message: 'Faltan parámetros obligatorios o se enviaron incorrectamente' },
     INVALID_MONGOID_FORMAT: { code: 3, status: 400, message: 'El ID no contiene un formato válido' },

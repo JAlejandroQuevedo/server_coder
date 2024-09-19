@@ -28,14 +28,13 @@ const initAuthStrategies = () => {
             try {
                 const foundUser = await ManagerLogin.getOne({ email: username });
                 if (foundUser && isValidPassword(password, foundUser.password)) {
-                    const { _id, name, lastName, email, gender } = foundUser;
+                    const { _id, name, lastName, email, gender, role } = foundUser;
                     const last_conection = dateTime();
                     const conection = new Date();
                     await modelUsers.updateOne({ _id: _id }, {
                         $set: { last_conection: last_conection, conection: conection }
                     })
-                    const savedRol = "premium";
-                    const userDone = req.session.user = { _id: _id, name: name, lastName: lastName, email: email, gender: gender, role: savedRol };
+                    const userDone = req.session.user = { _id: _id, name: name, lastName: lastName, email: email, gender: gender, role: role };
                     return done(null, userDone);
                 } else {
                     return done(null, false);
@@ -59,7 +58,7 @@ const initAuthStrategies = () => {
                 if (foundUser) {
                     return done(null, false, { message: 'El correo ya está registrado.' });
                 }
-                const passwordHash = createHash(password); d
+                const passwordHash = createHash(password);
                 const user = await ManagerLogin.addUser(name, lastName, email, gender, passwordHash);
 
                 return done(null, user);
@@ -75,7 +74,7 @@ const initAuthStrategies = () => {
         passReqToCallback: true
     }, async (req, accessToken, refreshToken, profile, done) => {
         try {
-            const savedRol = "premium";
+            // const savedRol = "premium";
             const foundUserGoogle = await modelUsersGoogle.find({ email: profile.emails[0].value });
             const foundUser = await ManagerLogin.getOne({ email: profile.emails[0].value });
             if (foundUserGoogle.length === 0 && !foundUser) {
@@ -87,7 +86,7 @@ const initAuthStrategies = () => {
                 const { name, lastName, email } = user;
                 ManagerLoginGoogle.addUser(name, lastName, email);
                 const user_register = await ManagerLoginGoogle.getOne({ email: email });
-                const userDone = req.session.user = { _id: user_register._id, name: name, lastName: lastName, email: email, role: savedRol };
+                const userDone = req.session.user = { _id: user_register._id, name: name, lastName: lastName, email: email, role: user_register.role };
                 return done(null, userDone);
             } else if (foundUserGoogle.length !== 0) {
                 const user = {
@@ -95,14 +94,14 @@ const initAuthStrategies = () => {
                     lastName: profile.name.familyName,
                     email: profile.emails[0].value,
                 }
-                const { name, lastName, email } = user;
+                const { name, lastName, email, role } = user;
                 const user_register = await ManagerLoginGoogle.getOne({ email: email });
                 const last_conection = dateTime();
                 const conection = new Date();
                 await modelUsersGoogle.updateOne({ email: email }, {
                     $set: { last_conection: last_conection, conection: conection }
                 })
-                const userDone = req.session.user = { _id: user_register._id, name: name, lastName: lastName, email: email, role: savedRol };
+                const userDone = req.session.user = { _id: user_register._id, name: name, lastName: lastName, email: email, role: user_register.role };
                 return done(null, userDone);
             } else {
                 // Limpiar los datos de sesión del usuario para asegurar que no queden datos en caché.

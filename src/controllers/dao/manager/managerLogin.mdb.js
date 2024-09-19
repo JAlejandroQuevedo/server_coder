@@ -137,6 +137,21 @@ class ManagerLogin {
             logger.error('Existe un error al actualizar el role del usuario')
         }
     }
+    static async updateRole(_uid, role) {
+        try {
+            let user = await modelUsers.updateOne({ _id: _uid }, { $set: { role: role } });
+            if (user.modifiedCount === 1) {
+                logger.info('Se cambio el role de manera exitosa ');
+            } else {
+                user = await modelUsersGoogle.updateOne({ _id: _uid }, { $set: { role: role } });
+                logger.info('Se cambio el role de usuarios registrados con google de manera exitosa ');
+            }
+            return user;
+        }
+        catch (err) {
+            logger.error('Existe un error al intentar actualizar el role del usuario')
+        }
+    }
     static async deleteUsers() {
         try {
             const twoMinutes = 2 * 60 * 1000;

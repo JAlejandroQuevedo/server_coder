@@ -29,86 +29,73 @@ import swaggerUiExpress from 'swagger-ui-express';
 import cron from 'node-cron';
 let socketServer; // == > Socket usado de manera global en el servidor
 //Servidor
-if (cluster.isPrimary) {
-    for (let i = 0; i < cpus().length; i++) cluster.fork();
+const app = express();
+const httpServer = app.listen(config.PORT, async () => {
+    // const connObj = {
+    //     host: '',
+    //     port: 5050,
+    //     username: '',
+    //     pass: ''
+    // }
+    factory()
+    // MongoSingleton.getInstance();
+    socketServer = chatSocket(httpServer);
+    app.set('socketServer', socketServer);
+    app.use(cors({ origin: '*' }))
+    app.use(express.json());
+    app.use(express.urlencoded({ extended: true }));
+    app.use(cookieParser(config.SECRET));
+    app.use(cors({ origin: '*' }))
+    app.use(session({
+        store: MongoStore.create({ mongoUrl: config.MONGODB_URI, ttl: 600 }),
+        secret: config.SECRET,
+        resave: true,
+        saveUninitialized: true
+    }));
 
-    cluster.on('exit', (worker, code, signal) => {
-        logger.warn(`Se cayó la instancia ${worker.process.pid}`);
-        cluster.fork();
-    });
-} else {
-    try {
-        const app = express();
-        const httpServer = app.listen(config.PORT, async () => {
-            // const connObj = {
-            //     host: '',
-            //     port: 5050,
-            //     username: '',
-            //     pass: ''
-            // }
-            factory()
-            // MongoSingleton.getInstance();
-            socketServer = chatSocket(httpServer);
-            app.set('socketServer', socketServer);
-            app.use(cors({ origin: '*' }))
-            app.use(express.json());
-            app.use(express.urlencoded({ extended: true }));
-            app.use(cookieParser(config.SECRET));
-            app.use(cors({ origin: '*' }))
-            app.use(session({
-                store: MongoStore.create({ mongoUrl: config.MONGODB_URI, ttl: 600 }),
-                secret: config.SECRET,
-                resave: true,
-                saveUninitialized: true
-            }));
+    //Configuracion de handlebars
 
-            //Configuracion de handlebars
+    app.engine('handlebars', handlebars.engine());
+    app.set('views', `${config.DIRNAME}/views`);
+    app.set('view engine', 'handlebars');
 
-            app.engine('handlebars', handlebars.engine());
-            app.set('views', `${config.DIRNAME}/views`);
-            app.set('view engine', 'handlebars');
+    //General routes
+    app.use(addLogger)
+    app.use('/api', routerProducts);
+    app.use('/api', routerCart);
+    // app.use('/api', cookieRoute);
+    app.use('/api/auth', jwtRouter);
+    app.use('/api', routerTicket);
+    app.use(mockingProducts);
+    app.use(loggerTest);
+    app.use('/api/users', usersRoutes);
+    // app.use('/api', routereMAIL)
 
-            //General routes
-            app.use(addLogger)
-            app.use('/api', routerProducts);
-            app.use('/api', routerCart);
-            // app.use('/api', cookieRoute);
-            app.use('/api/auth', jwtRouter);
-            app.use('/api', routerTicket);
-            app.use(mockingProducts);
-            app.use(loggerTest);
-            app.use('/api/users', usersRoutes);
-            // app.use('/api', routereMAIL)
-
-            //Custom routes
-            app.use('/api/', new ProductRouter().getRouter());
-            //View routes
-            app.use('/', routerHandle);
-            app.use('/static', express.static('public'))
+    //Custom routes
+    app.use('/api/', new ProductRouter().getRouter());
+    //View routes
+    app.use('/', routerHandle);
+    app.use('/static', express.static('public'))
 
 
-            app.use('/static', express.static(`${config.DIRNAME}/public`));
-            //Manejo de errorers
-            app.use(errorsHandler);
-            //Documentacion
-            app.use('/api/docs', swaggerUiExpress.serve, swaggerUiExpress.setup(specs));
-            //Configuracion de cron con tiempo de 5 horas
-            cron.schedule('0 */5 * * *', async () => {
-                try {
-                    ManagerLogin.deleteUsers();
-                    logger.info('Cuenta regresiva para comprobación de usuarios activos reiniciada');
-                }
-                catch (err) {
-                    logger.error('Error al eliminar usuarios:', err.message)
-                }
-            })
-            logger.info(`Servidor activo en puerto ${config.PORT} enlazada a bbdd en mode ${config.MODE} (PID ${process.pid})`);
-        })
+    app.use('/static', express.static(`${config.DIRNAME}/public`));
+    //Manejo de errorers
+    app.use(errorsHandler);
+    //Documentacion
+    app.use('/api/docs', swaggerUiExpress.serve, swaggerUiExpress.setup(specs));
+    //Configuracion de cron con tiempo de 5 horas
+    cron.schedule('0 */5 * * *', async () => {
+        try {
+            ManagerLogin.deleteUsers();
+            logger.info('Cuenta regresiva para comprobación de usuarios activos reiniciada');
+        }
+        catch (err) {
+            logger.error('Error al eliminar usuarios:', err.message)
+        }
+    })
+    logger.info(`Servidor activo en puerto ${config.PORT} enlazada a bbdd en mode ${config.MODE} (PID ${process.pid})`);
+})
 
-    }
-    catch (err) {
-        logger.error(`Error starting app (${err.message})`)
-    }
-}
+
 export { socketServer }
 

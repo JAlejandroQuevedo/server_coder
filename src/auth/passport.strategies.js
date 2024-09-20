@@ -2,10 +2,14 @@ import passport from 'passport';
 import local from 'passport-local';
 import jwt from 'passport-jwt';
 import { ManagerLogin } from '../controllers/dao/manager/managerLogin.mdb.js';
+import { ManagerLoginGoogle } from '../controllers/dao/manager/managerGogle.mdb.js';
 import { modelUsersGoogle } from '../controllers/dao/models/user.google.js';
+import { modelUsers } from '../controllers/dao/models/users.model.js';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { isValidPassword, createHash } from '../services/utils/bycript.js';
 import { config } from '../controllers/config/config.js';
+import { logger } from '../services/log/logger.js';
+import { dateTime } from '../services/utils/dateTime.js';
 
 const localStrategy = local.Strategy;
 const jwtStrategy = jwt.Strategy;
@@ -23,11 +27,14 @@ const initAuthStrategies = () => {
         async (req, username, password, done) => {
             try {
                 const foundUser = await ManagerLogin.getOne({ email: username });
-
                 if (foundUser && isValidPassword(password, foundUser.password)) {
-                    const { _id, name, lastName, email, gender } = foundUser;
-                    const savedRol = "premium";
-                    const userDone = req.session.user = { _id: _id, name: name, lastName: lastName, email: email, gender: gender, role: savedRol };
+                    const { _id, name, lastName, email, gender, role } = foundUser;
+                    const last_conection = dateTime();
+                    const conection = new Date();
+                    await modelUsers.updateOne({ _id: _id }, {
+                        $set: { last_conection: last_conection, conection: conection }
+                    })
+                    const userDone = req.session.user = { _id: _id, name: name, lastName: lastName, email: email, gender: gender, role: role };
                     return done(null, userDone);
                 } else {
                     return done(null, false);
@@ -67,27 +74,50 @@ const initAuthStrategies = () => {
         passReqToCallback: true
     }, async (req, accessToken, refreshToken, profile, done) => {
         try {
-            const savedRol = "admin";
-            const foundUser = await modelUsersGoogle.find({ email: profile.emails[0].value });
-            if (foundUser.length === 0) {
+            // const savedRol = "premium";
+            const foundUserGoogle = await modelUsersGoogle.find({ email: profile.emails[0].value });
+            const foundUser = await ManagerLogin.getOne({ email: profile.emails[0].value });
+            if (foundUserGoogle.length === 0 && !foundUser) {
                 const user = {
                     name: profile.name.givenName,
                     lastName: profile.name.familyName,
                     email: profile.emails[0].value,
                 }
                 const { name, lastName, email } = user;
-                const userDone = req.session.user = { name: name, lastName: lastName, email: email, role: savedRol };
-                modelUsersGoogle.create(user);
+                ManagerLoginGoogle.addUser(name, lastName, email);
+                const user_register = await ManagerLoginGoogle.getOne({ email: email });
+                const userDone = req.session.user = { _id: user_register._id, name: name, lastName: lastName, email: email, role: user_register.role };
+                return done(null, userDone);
+            } else if (foundUserGoogle.length !== 0) {
+                const user = {
+                    name: profile.name.givenName,
+                    lastName: profile.name.familyName,
+                    email: profile.emails[0].value,
+                }
+                const { name, lastName, email, role } = user;
+                const user_register = await ManagerLoginGoogle.getOne({ email: email });
+                const last_conection = dateTime();
+                const conection = new Date();
+                await modelUsersGoogle.updateOne({ email: email }, {
+                    $set: { last_conection: last_conection, conection: conection }
+                })
+                const userDone = req.session.user = { _id: user_register._id, name: name, lastName: lastName, email: email, role: user_register.role };
                 return done(null, userDone);
             } else {
-                const user = {
-                    name: profile.name.givenName,
-                    lastName: profile.name.familyName,
-                    email: profile.emails[0].value,
+                // Limpiar los datos de sesión del usuario para asegurar que no queden datos en caché.
+                if (req.session) {
+                    req.session.destroy((err) => {
+                        if (err) {
+                            logger.error('Error al intentar destruir la sesión: ', err);
+                            return done(err);
+                        }
+                        logger.warn('El usuario ya está registrado. Los datos de la sesión han sido restablecidos.');
+                        return done(null, false, { message: 'Usuario ya registrado, por favor inicia sesión.' });
+                    });
+                } else {
+                    logger.warn('El usuario ya está registrado, pero no se encontró ninguna sesión activa.');
+                    return done(null, false, { message: 'Usuario ya registrado, por favor inicia sesión.' });
                 }
-                const { name, lastName, email } = user;
-                const userDone = req.session.user = { name: name, lastName: lastName, email: email, role: savedRol };
-                return done(null, userDone);
             }
         }
         catch (err) {

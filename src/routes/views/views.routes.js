@@ -48,6 +48,10 @@ routerHandle.get('/profileCurrent', (req, res) => {
     if (!req.session.user) return res.redirect('/loginCurrent');
     res.render('profileCurrent', { user: req.session.user });
 });
+routerHandle.get('/role', (req, res) => {
+    if (!req.session.user) return res.redirect('/login');
+    res.render('role', { user: req.session.user });
+});
 
 
 export { routerHandle }

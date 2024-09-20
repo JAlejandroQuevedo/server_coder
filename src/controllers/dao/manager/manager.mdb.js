@@ -1,12 +1,14 @@
 // import modelProducts from "../factory/dao.factory.js";
 import { modelProducts } from "../models/products.model.js";
 import { logger } from "../../../services/log/logger.js";
+import { modelUsers } from "../models/users.model.js";
+import { sendMail } from "../../../services/mail/send.email.js";
 
 // const modelProducts = new ProductsService()
 
 class CollectionManager {
 
-    static products = [];
+    // static products = [];
 
     static async getProducts(limit) {
         try {
@@ -22,13 +24,13 @@ class CollectionManager {
             }
         }
         catch (error) {
-            console.error('Error al leer el archivo', error)
+            logger.error('Error al leer los productos', error);
         }
     }
     static async addProduct(title, description, price, category, thumbnail, code, stock, owner) {
         try {
             const products = await modelProducts.find()
-            if (products.some(product => product.code === code)) return console.error(`El codigo de tu producto se encuentra en uso`)
+            if (products.some(product => product.code === code)) return logger.warn('El código de tu producto se encuentra en uso');
             const product = {
                 title: title,
                 description: description,
@@ -40,18 +42,19 @@ class CollectionManager {
                 stock: stock,
                 owner: `${owner}`
             };
+            logger.info('Producto creado con exito')
             return await modelProducts.create(product);
             // return product;
         }
         catch (error) {
-            console.error('Error al intentar escribir el archivo', error)
+            logger.error('Error al intentar escribir el archivo', error);
         }
 
     }
     static async getProductById(id) {
         const products = await modelProducts.findById(id);
         if (!products) {
-            console.error('Producto no encontrado')
+            logger.warn('Producto no encontrado');
         }
         return products;
     }
@@ -65,7 +68,7 @@ class CollectionManager {
             return process;
         }
         catch (error) {
-            console.error('Existe un error al intentar actualizar el archivo', error)
+            logger.error('Error al intentar obtener el producto por ID', error);
         }
     }
 
@@ -76,6 +79,15 @@ class CollectionManager {
                 const process = await modelProducts.findOneAndDelete(filter);
                 return process;
             } else if (_userRole === 'premium') {
+                const user = await modelUsers.find({ _id: _userId });
+                await sendMail(
+                    'Alerta',
+                    user[0].email,
+                    'Producto eliminado de manera correcta',
+                    `
+                        <h3>Tu producto fue eliminado correctamente</h3>
+                        `
+                );
                 const filter = { _id: id, owner: _userId };
                 const process = await modelProducts.findOneAndDelete(filter);
                 return process;
@@ -84,7 +96,7 @@ class CollectionManager {
             }
         }
         catch (error) {
-            console.error('Existe un error al intentar eliminar el elemento del archivo', error(error))
+            logger.error('Existe un error al intentar eliminar el elemento del archivo', error);
         }
     }
     static async sortProducts(sort) {
@@ -102,7 +114,7 @@ class CollectionManager {
             }
         }
         catch (err) {
-            console.error('Error en el servidor', err)
+            logger.error('Error en el servidor', err);
         }
     }
 

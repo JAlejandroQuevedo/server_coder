@@ -10,6 +10,7 @@ const schema = new mongoose.Schema({
     email: { type: String, required: true },
     gender: { type: String, required: true },
     password: { type: String, required: true },
+    last_conection: { type: String, required: true },
     documents: [
         {
             name: {
@@ -23,7 +24,7 @@ const schema = new mongoose.Schema({
         }
     ],
     role: { type: String, enum: ['admin', 'premium', 'user'], default: 'user' },
-    last_conection: { type: String, required: true }
+    conection: { type: Date, required: false }
 });
 schema.plugin(mongoosePaginate)
 const modelUsers = mongoose.model(collection, schema);

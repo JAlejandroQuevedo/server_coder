@@ -162,10 +162,10 @@ class ManagerLogin {
             const now = new Date();
 
             const timeLimitGoogle = await modelUsersGoogle.find({
-                conection: { $lt: new Date(now - twoMinutes) }
+                conection: { $lt: new Date(now - oneMonth) }
             })
             const timeLimit = await modelUsers.find({
-                conection: { $lt: new Date(now - twoMinutes) }
+                conection: { $lt: new Date(now - oneMonth) }
             })
             if (timeLimitGoogle.length > 0) {
                 for (const user of timeLimitGoogle) {

@@ -43,5 +43,5 @@ const config = {
     API_SECRET: process.env.API_SECRET,
     KEY_ROLE: process.env.KEY
 }
-config.BASE_URL = `http://localhost:${config.PORT}`
+config.BASE_URL = `https://servercoder-production.up.railway.app`
 export { config }

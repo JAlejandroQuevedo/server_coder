@@ -1,4 +1,4 @@
-<section style="margin-bottom: 1em;">
+<section id="section" style="margin-bottom: 1em;">
     <div class="row">
         {{#each cart}}
         <div class="card" style="width: 260px; padding: 0; margin: 1em;">
@@ -9,29 +9,77 @@
             <div class="card-body">
                 <h5 class="card-title">{{this.title}}</h5>
                 <p class="card-text">{{this.description}}</p>
+                <p class="card-text">Stock: {{this.stock}}</p>
+                <p class="card-text">Cantidad {{this.quantity}}</p>
                 <p class="card-text" style="text-align: right; font-size: 200%; font-weight: bold;">USD {{this.price}}
                 </p>
             </div>
             <div class="card-footer" style="text-align: right;">
-                <a class="btn btn-warning" onclick="addToCart('{{this._id}}')">Finalizar compra</a>
+                <a class="btn btn-warning" onclick="deleteProducts('{{this._id}}')">Eliminar productos del carrito</a>
             </div>
         </div>
         {{/each}}
+    </div>
+    <div class="card-footer" style="text-align: right;">
+        <a class="btn btn-warning" onclick="endPurchase('{{this._id}}')">Finalizar compra</a>
     </div>
 </section>
 
 <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"
     integrity="sha384-2huaZvOR9iDzHqslqwpR87isEmrfxqyWOF7hr7BY6KG0+hVKLoEXMPUJw3ynWuhO"
     crossorigin="anonymous"></script>
-<script type="module">
+<script>
     const address = 'ws://localhost:8080';
     const socketClient = io(address);
-    const div = document.getElementById('div');
+    const section = document.getElementById('section');
+
 
     socketClient.on('newClientConnected', data => {
         console.log(data)
     })
+    const deleteProducts = (productId) => {
+        console.log('Eliminando producto');
 
+        // Lógica para enviar el producto al carrito a través de una petición AJAX
+        fetch(`/api/carts/${productId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Producto eliminado con exito");
+                }
+            })
+            .catch(error => {
+                console.error("Error al eliminar el producto", error);
+            });
+    }
+    const endPurchase = (productId) => {
+        console.log('Finalizando compra');
+
+        // Lógica para enviar el producto al carrito a través de una petición AJAX
+        fetch(`/api/tickets`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Compra finalizada con exito");
+                }
+            })
+            .catch(error => {
+                console.error("Error al Finalizar la compra:", error);
+            });
+        section.innerHTML = `
+                <p class="card-text" style="text-align: right; font-size: 200%; font-weight: bold;">Compra finalizada con exito y ticket generado</p>
+    `
+    }
     socketClient.on('productsCart', data => {
         console.log(data)
         data.forEach(({ id, title, description, price, category, stock }) => {
@@ -45,6 +93,7 @@
 
             `
         })
+
     })
 
 

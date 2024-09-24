@@ -174,7 +174,7 @@ class ManagerLogin {
                         user.email,
                         'Tiempo inactivo permitido excedido, tu cuenta ha sido eliminada',
                         `<h3>Lo sentimos,tu cuenta fue eliminada</h3>
-                        <a href="http://localhost:8080/register">Haz click aquí para crear una nueva</a>`
+                        <a href="https://servercoder-production.up.railway.app/register">Haz click aquí para crear una nueva</a>`
                     );
                     await modelUsersGoogle.deleteMany({ email: user.email })
                 }
@@ -191,7 +191,7 @@ class ManagerLogin {
                         'Tiempo inactivo permitido excedido, tu cuenta ha sido eliminada',
                         `
                         <h3>Lo sentimos, tu cuenta fue eliminada</h3>
-                        <a href="http://localhost:8080/register">Haz click aquí para crear una nueva</a>
+                        <a href="https://servercoder-production.up.railway.app/register">Haz click aquí para crear una nueva</a>
                         `
                     );
                     logger.warn('La conexion supera el limite permitido en usuarios registrados de manera manual')

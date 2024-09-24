@@ -70,7 +70,7 @@ const initAuthStrategies = () => {
     passport.use(new GoogleStrategy({
         clientID: config.GOOGLE_CLIENT_ID,
         clientSecret: config.GOOGLE_CLIENT_SECRET,
-        callbackURL: '/api/auth/google/callback',
+        callbackURL: 'https://servercoder-production.up.railway.app/api/auth/google/callback',
         passReqToCallback: true
     }, async (req, accessToken, refreshToken, profile, done) => {
         try {

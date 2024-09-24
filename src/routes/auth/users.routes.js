@@ -25,7 +25,7 @@ usersRoutes.get('/', async (req, res) => {
     }
 })
 
-usersRoutes.put('/role/:key/:uid', verifyKeyAdmin, verifyRequiredBodyRole(['admin', 'premium']), adminAuth, async (req, res) => {
+usersRoutes.put('/role/:key/:uid', verifyKeyAdmin, verifyRequiredBodyRole(['user', 'admin', 'premium']), adminAuth, async (req, res) => {
     try {
         const _uid = req.params.uid;
         const role = req.body.role

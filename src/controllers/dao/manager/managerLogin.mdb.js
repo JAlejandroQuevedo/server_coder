@@ -19,6 +19,7 @@ class ManagerLogin {
             const users = await modelUsers.find()
             const user_filter = users.map(user => {
                 return {
+                    _id: user._id,
                     name: user.name,
                     lastName: user.lastName,
                     email: user.email,

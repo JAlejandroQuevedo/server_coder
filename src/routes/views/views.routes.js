@@ -2,6 +2,9 @@ import { Router } from "express";
 import { handlePolicies } from "../../services/utils/policies.js";
 import { CollectionManager } from "../../controllers/dao/manager/manager.mdb.js";
 import { ColectionManagerCart } from "../../controllers/dao/manager/managerCart.mdb.js";
+import { ManagerLogin } from "../../controllers/dao/manager/managerLogin.mdb.js";
+import { ManagerLoginGoogle } from "../../controllers/dao/manager/managerGogle.mdb.js";
+import { config } from "../../controllers/config/config.js"
 
 
 const routerHandle = Router();
@@ -52,9 +55,17 @@ routerHandle.get('/profileCurrent', (req, res) => {
     if (!req.session.user) return res.redirect('/loginCurrent');
     res.render('profileCurrent', { user: req.session.user });
 });
-routerHandle.get('/role', (req, res) => {
+routerHandle.get('/role', async (req, res) => {
     if (!req.session.user) return res.redirect('/login');
-    res.render('role', { user: req.session.user });
+    const users = await ManagerLogin.getUsers();
+    const usersGoogle = await ManagerLoginGoogle.getUsers();
+    res.render('role', { users, usersGoogle, KEY: config.KEY_ROLE });
+});
+routerHandle.get('/roles', async (req, res) => {
+    if (!req.session.user) return res.redirect('/login');
+    const users = await ManagerLogin.getUsers();
+    const usersGoogle = await ManagerLoginGoogle.getUsers();
+    res.render('log', { users, usersGoogle, KEY: config.KEY_ROLE });
 });
 routerHandle.get('/payments', async (req, res) => {
     if (!req.session.user) return res.redirect('/login');

@@ -1,0 +1,131 @@
+<style>
+    body {
+        background-color: #333;
+    }
+
+    .register-container {
+        max-width: 360px;
+        margin: auto;
+        margin-top: 64px;
+        padding: 32px;
+        border-radius: 0.5em;
+        color: #333;
+        border: 1px solid #bbb;
+        background-color: #ccc;
+    }
+
+    .btn-100 {
+        width: 100%;
+        margin-bottom: 0.5em;
+    }
+
+    .a2 {
+        color: #333;
+    }
+
+    .a2:hover {
+        color: #000;
+    }
+</style>
+
+
+<div class="register-container">
+    <h1><b>CODER LOGIN</b></h1>
+    <h2><b>Registro</b></h2>
+
+    <!-- Formulario para usuarios registrados -->
+    <div class="input-group" style="width: 100%; margin-bottom: 8px;">
+        <span class="input-group-text" id="group4"><i class="fa-solid fa-venus-mars"></i></span>
+
+        <!-- Selector de usuarios -->
+        <select id="userSelect" class="form-control">
+            {{#each users}}
+            <option value="{{this._id}}">{{this.name}} {{this.lastName}}</option>
+            {{/each}}
+        </select>
+
+        <!-- Selector para roles -->
+        <select id="roleSelect" class="form-control">
+            <option value="user">user</option>
+            <option value="admin">admin</option>
+            <option value="premium">premium</option>
+        </select>
+
+        <!-- Botón que llama a la función de JavaScript -->
+        <button onclick="changeRole()" class="btn btn-success btn-100">Cambiar role</button>
+    </div>
+
+    <!-- Formulario para usuarios de Google -->
+    <div class="input-group" style="width: 100%; margin-top: 32px;">
+        <h2><b>Usuarios de google</b></h2>
+        <span class="input-group-text" id="group4"><i class="fa-solid fa-venus-mars"></i></span>
+
+        <!-- Selector de usuarios de Google -->
+        <select id="userGoogleSelect" class="form-control">
+            {{#each usersGoogle}}
+            <option value="{{this._id}}">{{this.name}} {{this.lastName}}</option>
+            {{/each}}
+        </select>
+
+        <!-- Selector para roles -->
+        <select id="roleGoogleSelect" class="form-control">
+            <option value="user">user</option>
+            <option value="admin">admin</option>
+            <option value="premium">premium</option>
+        </select>
+
+        <!-- Botón que llama a la función de JavaScript -->
+        <button onclick="changeRoleGoogle()" class="btn btn-success btn-100">Cambiar role</button>
+    </div>
+</div>
+
+
+
+
+<script>
+    const key = "{{KEY}}";
+    const changeRole = () => {
+        const userId = document.getElementById('userSelect').value;
+        const newRole = document.getElementById('roleSelect').value;
+        console.log(userId)
+        fetch(`/api/users/role/${key}/${userId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ role: newRole })
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert('Rol cambiado exitosamente');
+                } else {
+                    alert('Error al cambiar el rol');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+    const changeRoleGoogle = () => {
+        const userGoogleId = document.getElementById('userGoogleSelect').value;
+        const newRoleGoogle = document.getElementById('roleGoogleSelect').value;
+        fetch(`/api/users/role/${key}/${userGoogleId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ role: newRoleGoogle })
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert('Rol cambiado exitosamente');
+                } else {
+                    alert('Error al cambiar el rol');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+
+</script>

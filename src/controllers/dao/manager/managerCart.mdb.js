@@ -14,11 +14,11 @@ class ColectionManagerCart {
     static async getUserCart(_user_id, limit) {
         try {
             if (limit) {
-                const products = await modelCart.find({ _user_id: _user_id })
+                const products = await modelCart.find({ _user_id: _user_id }).lean()
                 this.cart = products;
                 return limit === 0 ? products : products.slice(0, limit);
             } else {
-                const products = await modelCart.find({ _user_id: _user_id })
+                const products = await modelCart.find({ _user_id: _user_id }).lean()
                 return products;
             }
         }
@@ -65,17 +65,10 @@ class ColectionManagerCart {
                 const products = await Promise.all(cart.map(async (productFind) => {
                     return await modelProducts.findById(productFind._product_id)
                 }))
+                const endCart = [];
                 return await Promise.all(products.map(async ({ stock }) => {
                     cart.map(async ({ _product_id, quantity }) => {
                         if (stock < quantity || quantity > stock) return console.error('El stock es mayor a la cantidad indicada en el carrito, la compra no puede ser procesada');
-                        await sendMail(
-                            'Confirmacion de compra',
-                            user.email,
-                            'Confirmacion de compra',
-                            `
-                                <h1>¡Compra realizada con exito!</h1>
-                            `
-                        )
                         const newStock = +stock - quantity;
                         await modelProducts.updateOne({ _id: _product_id }, { $set: { stock: `${newStock}` } });
                         await modelCart.findOneAndDelete({ _user_id: _user_id })

@@ -24,10 +24,10 @@ routerTicket.post('/tickets', async (req, res) => {
     try {
         const _user_id = req.body._id || req.session.user._id;
         await ColectionManagerTicket.createTicket(_user_id);
-        res.status(200).send('Ticket creado con exito');
         const tickets = await ColectionManagerTicket.getTickets();
         socketServer.emit('tickets', tickets);
         req.logger.info('Ticket creado con exito');
+        res.redirect('/api/purchase');
     }
     catch (err) {
         req.logger.error('Error al ingresar el ticket del producto:', err);

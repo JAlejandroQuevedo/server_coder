@@ -107,7 +107,7 @@ routerCart.get('/purchase', async (req, res) => {
     try {
         const _user_id = req.session.user._id;
         await ColectionManagerCart.endPurchase(_user_id);
-        res.status(200).send('Compra finalizada con exito');
+        res.status(200).send('Compra finalizada con exito y ticket generado');
         const productsCart = await ColectionManagerCart.getProducts();
         socketServer.emit('productsCart', productsCart);
         req.logger.info('Compra finalizada con exito');

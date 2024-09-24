@@ -1,5 +1,7 @@
 import { Router } from "express";
 import { handlePolicies } from "../../services/utils/policies.js";
+import { CollectionManager } from "../../controllers/dao/manager/manager.mdb.js";
+import { ColectionManagerCart } from "../../controllers/dao/manager/managerCart.mdb.js";
 
 
 const routerHandle = Router();
@@ -8,8 +10,10 @@ routerHandle.get('/product', (req, res) => {
     const user = { firstName: 'Carla' };
     res.render('index', user)
 })
-routerHandle.get('/cart', (req, res) => {
-    res.render('cart.handlebars', {})
+routerHandle.get('/cart', async (req, res) => {
+    const _user_id = req.session.user._id;
+    const cart = await ColectionManagerCart.getUserCart(_user_id);
+    res.render('cart.handlebars', { cart })
 })
 routerHandle.get('/chat', handlePolicies(['user']), (req, res) => {
     res.render('chat.handlebars', {})
@@ -51,6 +55,11 @@ routerHandle.get('/profileCurrent', (req, res) => {
 routerHandle.get('/role', (req, res) => {
     if (!req.session.user) return res.redirect('/login');
     res.render('role', { user: req.session.user });
+});
+routerHandle.get('/payments', async (req, res) => {
+    if (!req.session.user) return res.redirect('/login');
+    const products = await CollectionManager.getProducts();
+    res.render('payments', { products });
 });
 
 

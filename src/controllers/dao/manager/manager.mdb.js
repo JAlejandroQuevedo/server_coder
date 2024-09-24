@@ -13,11 +13,11 @@ class CollectionManager {
     static async getProducts(limit) {
         try {
             if (limit) {
-                const products = await modelProducts.find();
+                const products = await modelProducts.find().lean();
                 this.products = products;
                 return limit === 0 ? products : products.slice(0, limit);
             } else {
-                const products = await modelProducts.find();
+                const products = await modelProducts.find().lean();
                 // req
                 return products;
 

@@ -3,6 +3,7 @@ import { modelUsers } from "../models/users.model.js";
 import { generateCode } from "../../../services/utils/code.js";
 import { modelCart } from "../models/cart.model.js";
 import { logger } from "../../../services/log/logger.js";
+import { sendMail } from "../../../services/mail/send.email.js";
 class ColectionManagerTicket {
     static tickets = [];
     static data;
@@ -53,6 +54,14 @@ class ColectionManagerTicket {
                 }
                 this.tickets.push(ticket)
                 await modelTicket.create(ticket);
+                await sendMail(
+                    'Confirmacion de compra',
+                    userGet.email,
+                    'Confirmacion de compra',
+                    `
+                                <h1>¡Compra realizada con exito!</h1>
+                            `
+                )
             }
         } catch (err) {
             logger.error('Existe un error al intentar agregar tu producto al carrito', err)

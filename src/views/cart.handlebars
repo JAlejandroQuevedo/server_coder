@@ -1,7 +1,24 @@
-<div>
-    <h1>Te muestro mis productos del carrito</h1>
-</div>
-<div id="div" style="background-color: white; color: black"></div>
+<section style="margin-bottom: 1em;">
+    <div class="row">
+        {{#each cart}}
+        <div class="card" style="width: 260px; padding: 0; margin: 1em;">
+            {{!-- Verificamos si existe una imagen en thumbnail y la mostramos --}}
+            {{#if this.thumbnail}}
+            <img src="{{this.thumbnail}}" class="card-img-top" alt="{{this.title}}" style="width: 100%;">
+            {{/if}}
+            <div class="card-body">
+                <h5 class="card-title">{{this.title}}</h5>
+                <p class="card-text">{{this.description}}</p>
+                <p class="card-text" style="text-align: right; font-size: 200%; font-weight: bold;">USD {{this.price}}
+                </p>
+            </div>
+            <div class="card-footer" style="text-align: right;">
+                <a class="btn btn-warning" onclick="addToCart('{{this._id}}')">Finalizar compra</a>
+            </div>
+        </div>
+        {{/each}}
+    </div>
+</section>
 
 <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"
     integrity="sha384-2huaZvOR9iDzHqslqwpR87isEmrfxqyWOF7hr7BY6KG0+hVKLoEXMPUJw3ynWuhO"
